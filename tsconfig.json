@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "es6",
+    "target": "es5",
+    "outDir": "./dist/",
+    "rootDir": "./src/",
+    "moduleResolution": "node",
+    //"strict": true,
+    "strictNullChecks": false,
+    "esModuleInterop": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/dist"
+  ]
+}
