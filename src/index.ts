@@ -21,6 +21,12 @@ const init = async (app) => {
   console.log(videoInstance.devices);
 
   const handpose = new HandposeDetection(canvas);
+  handpose.onPositionUpdate((point) => {
+    console.log({
+      position: point.center,
+      state: point.distance > 50 ? "open" : "closed",
+    });
+  });
 
   //const cursorInstance = new Cursor();
 };
