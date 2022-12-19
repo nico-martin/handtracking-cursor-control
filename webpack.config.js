@@ -1,6 +1,8 @@
 const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
 const app = require("./package.json");
 require("dotenv").config();
 
@@ -29,6 +31,11 @@ module.exports = (env) => {
     entry: {
       app: `${dirSrc}/index.ts`,
     },
+    performance: {
+      maxAssetSize: 5000000,
+      maxEntrypointSize: 5000000,
+      hints: "error",
+    },
     output: {
       path: dirDist,
       filename: dev ? "assets/[name].js" : "assets/[name]-[fullhash].js",
@@ -40,6 +47,27 @@ module.exports = (env) => {
           test: /\.ts?$/,
           use: "ts-loader",
           exclude: /node_modules/,
+        },
+        {
+          test: /\.css$/,
+          exclude: [/node_modules/],
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            {
+              loader: "css-loader",
+              options: {
+                importLoaders: 1,
+                modules: {
+                  localIdentName: "[name]__[local]--[hash:base64:5]",
+                },
+              },
+            },
+            {
+              loader: "postcss-loader",
+            },
+          ],
         },
       ],
     },
@@ -72,6 +100,12 @@ module.exports = (env) => {
               removeStyleLinkTypeAttributes: true,
               useShortDoctype: true,
             },
+      }),
+      new MiniCssExtractPlugin({
+        filename: dev ? "assets/[name].css" : "assets/[name].[hash].css",
+        chunkFilename: dev
+          ? "assets/[name].[id].css"
+          : "assets/[name].[id].[hash].css",
       }),
     ],
   };
