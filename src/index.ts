@@ -1,7 +1,7 @@
 import styles from "./index.css";
 import Video from "./helpers/video";
-import Cursor from "./helpers/cursor";
-import HandposeDetection from "./helpers/handposeDetection";
+import Cursor, { CURSOR_STATE } from "./helpers/cursor";
+import HandposeDetection, { HANDPOSES } from "./helpers/handposeDetection";
 
 const init = async (app) => {
   if (!app) return;
@@ -18,17 +18,24 @@ const init = async (app) => {
 
   const videoInstance = new Video(app, video, canvas);
   await videoInstance.startUp();
-  console.log(videoInstance.devices);
+  //console.log(videoInstance.devices);
+
+  const cursorInstance = new Cursor(styles.cursor);
 
   const handpose = new HandposeDetection(canvas);
-  handpose.onPositionUpdate((point) => {
-    console.log({
-      position: point.center,
-      state: point.distance > 50 ? "open" : "closed",
-    });
-  });
 
-  //const cursorInstance = new Cursor();
+  handpose.onPositionUpdate((point) => {
+    const x = window.innerWidth - point.position.x; // because transform: scaleX(-1) in index.css
+    const y = point.position.y;
+
+    cursorInstance.setCursorPosition(x, y);
+
+    if (point.handpose === HANDPOSES.INDEX_TO_THUMB) {
+      cursorInstance.setCursorState(CURSOR_STATE.LEFTCLICK);
+    } else {
+      cursorInstance.setCursorState(CURSOR_STATE.OPEN);
+    }
+  });
 };
 
 init(document.querySelector<HTMLDivElement>("#app"));

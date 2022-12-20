@@ -1,6 +1,6 @@
 class Video {
-  private video: HTMLVideoElement = null;
-  private canvas: HTMLCanvasElement = null;
+  private readonly video: HTMLVideoElement = null;
+  private readonly canvas: HTMLCanvasElement = null;
   private activeCameraID = null;
   private artboardSize: { width: number; height: number } = {
     height: 0,
@@ -81,7 +81,7 @@ class Video {
       30
     );
     await this.video.play();
-    this.video.addEventListener("loadeddata", (event) => {
+    this.video.addEventListener("loadeddata", () => {
       console.log("Camera is ready");
     });
     this.renderCanvas();

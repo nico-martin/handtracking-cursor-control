@@ -13,7 +13,14 @@ tfjsWasm.setWasmPaths(
 const UPDATE_EVENT_KEY = "nm-update-position-emitter";
 let INSTANCES = 0;
 
-type PointType = { center: { x: number; y: number }; distance: number };
+export enum HANDPOSES {
+  DEFAULT = "default",
+  FIST = "fist",
+  INDEX_TO_THUMB = "indexToThumb",
+  MIDDLE_TO_THUMB = "middleToThumb",
+}
+
+type PointType = { position: { x: number; y: number }; handpose: HANDPOSES };
 
 class HandposeDetection {
   private detector: HandDetector = null;
@@ -33,10 +40,12 @@ class HandposeDetection {
       solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/hands",
       modelType: "full",
     };
-    handdetection.createDetector(model, detectorConfig).then((detector) => {
-      this.detector = detector;
-      this.doPredictions();
-    });
+    handdetection
+      .createDetector(model, detectorConfig)
+      .then(async (detector) => {
+        this.detector = detector;
+        await this.doPredictions();
+      });
   }
 
   private drawPoint = (x, y, r, color = "black", text = "") => {
@@ -51,7 +60,7 @@ class HandposeDetection {
   private findCenterAndDistance = (
     p1: { x: number; y: number },
     p2: { x: number; y: number }
-  ): PointType => {
+  ): { center: { x: number; y: number }; distance: number } => {
     const centerX = (p1.x + p2.x) / 2;
     const centerY = (p1.y + p2.y) / 2;
     const distance = Math.sqrt(
@@ -60,7 +69,7 @@ class HandposeDetection {
     return { center: { x: centerX, y: centerY }, distance: distance };
   };
 
-  private doPredictions = async () => {
+  private doPredictions = async (): Promise<void> => {
     const hands = await this.detector.estimateHands(this.canvas);
     const rightHand: Hand =
       hands.find((hand) => hand.handedness === "Left") || null;
@@ -74,7 +83,15 @@ class HandposeDetection {
       );
       const middlePoint = this.findCenterAndDistance(indexTip, thumbTip);
       document.dispatchEvent(
-        new CustomEvent(this.updateEventKey, { detail: middlePoint })
+        new CustomEvent(this.updateEventKey, {
+          detail: {
+            position: middlePoint.center,
+            handpose:
+              middlePoint.distance > 50
+                ? HANDPOSES.DEFAULT
+                : HANDPOSES.INDEX_TO_THUMB,
+          },
+        })
       );
 
       this.drawPoint(middlePoint.center.x, middlePoint.center.y, 10, "black");

@@ -1,33 +1,58 @@
-class Cursor {
-  private cursor: HTMLDivElement = null;
+export enum CURSOR_STATE {
+  OPEN = "open",
+  RIGHTCLICK = "right",
+  LEFTCLICK = "left",
+}
 
-  constructor() {
+class Cursor {
+  private readonly cursor: HTMLDivElement = null;
+  private cursorState: CURSOR_STATE = CURSOR_STATE.OPEN;
+
+  constructor(className: string = "") {
     this.cursor = document.createElement("div");
-    this.cursor.style.width = "20px";
-    this.cursor.style.height = "20px";
-    this.cursor.style.backgroundColor = "blue";
+    className && this.cursor.classList.add(className);
+    this.cursor.style.borderColor = "black";
     this.cursor.style.position = "fixed";
     this.cursor.style.top = "100px";
     this.cursor.style.left = "100px";
     document.body.appendChild(this.cursor);
   }
 
-  public setCursorVisibility = (visible: boolean): void => {
-    if (!visible) {
-      this.cursor.style.display = "none";
-    } else {
-      this.cursor.style.display = "block";
+  public setCursorColor = (color: string): void => {
+    this.cursor.style.borderColor = color;
+  };
+
+  public setCursorPosition = (left: number, top: number): void => {
+    this.cursor.style.top = top + "px";
+    this.cursor.style.left = left + "px";
+  };
+
+  public setCursorState = (state: CURSOR_STATE) => {
+    if (state === this.cursorState) return;
+    this.onCursorStateChange(state);
+    this.cursorState = state;
+  };
+
+  public onCursorStateChange = (state: CURSOR_STATE) => {
+    if (state === CURSOR_STATE.LEFTCLICK) {
+      console.log(this.cursor.style.borderColor);
+      this.cursor.style.backgroundColor = this.cursor.style.borderColor;
+      this.click();
+    } else if (state === CURSOR_STATE.OPEN) {
+      this.cursor.style.backgroundColor = "transparent";
     }
   };
 
-  public setCursorColor(color: string): void {
-    this.cursor.style.backgroundColor = color;
-  }
+  public click = () => {
+    const rect = this.cursor.getBoundingClientRect();
 
-  public setCursorPosition(left: number, top: number): void {
-    this.cursor.style.top = window.innerHeight * top + "px";
-    this.cursor.style.left = window.innerWidth * left + "px";
-  }
+    const evt = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    document.elementFromPoint(rect.left, rect.top).dispatchEvent(evt);
+  };
 }
 
 export default Cursor;
