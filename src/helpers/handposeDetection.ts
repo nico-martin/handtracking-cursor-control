@@ -1,17 +1,16 @@
-import "@tensorflow/tfjs-backend-webgl";
-import { MediaPipeHandsMediaPipeModelConfig } from "@tensorflow-models/hand-pose-detection";
-import * as handdetection from "@tensorflow-models/hand-pose-detection";
-import { HandDetector } from "@tensorflow-models/hand-pose-detection/dist/hand_detector";
-import { Hand } from "@tensorflow-models/hand-pose-detection/dist/types";
+import {
+  createDetector,
+  HandDetector,
+  Hand,
+  SupportedModels,
+} from "@tensorflow-models/hand-pose-detection";
 
-import * as tfjsWasm from "@tensorflow/tfjs-backend-wasm";
+import { setWasmPaths, version_wasm } from "@tensorflow/tfjs-backend-wasm";
+import EventBus from "./EventBus";
 
-tfjsWasm.setWasmPaths(
-  `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`
+setWasmPaths(
+  `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${version_wasm}/dist/`
 );
-
-const UPDATE_EVENT_KEY = "nm-update-position-emitter";
-let INSTANCES = 0;
 
 export enum HANDPOSES {
   DEFAULT = "default",
@@ -26,26 +25,20 @@ class HandposeDetection {
   private detector: HandDetector = null;
   private readonly canvas: HTMLCanvasElement = null;
   private ctx: CanvasRenderingContext2D = null;
-  private readonly updateEventKey: string = null;
+  private eventBus = new EventBus<{ "update-position": PointType }>();
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    INSTANCES++;
-    this.updateEventKey = UPDATE_EVENT_KEY + "-" + INSTANCES;
 
-    const model = handdetection.SupportedModels.MediaPipeHands;
-    const detectorConfig: MediaPipeHandsMediaPipeModelConfig = {
+    createDetector(SupportedModels.MediaPipeHands, {
       runtime: "mediapipe", // or 'tfjs',
       solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/hands",
       modelType: "full",
-    };
-    handdetection
-      .createDetector(model, detectorConfig)
-      .then(async (detector) => {
-        this.detector = detector;
-        await this.doPredictions();
-      });
+    }).then(async (detector) => {
+      this.detector = detector;
+      await this.doPredictions();
+    });
   }
 
   private drawPoint = (x, y, r, color = "black", text = "") => {
@@ -71,6 +64,7 @@ class HandposeDetection {
 
   private doPredictions = async (): Promise<void> => {
     const hands = await this.detector.estimateHands(this.canvas);
+
     const rightHand: Hand =
       hands.find((hand) => hand.handedness === "Left") || null;
 
@@ -82,17 +76,13 @@ class HandposeDetection {
         (finger) => finger.name === "thumb_tip"
       );
       const middlePoint = this.findCenterAndDistance(indexTip, thumbTip);
-      document.dispatchEvent(
-        new CustomEvent(this.updateEventKey, {
-          detail: {
-            position: middlePoint.center,
-            handpose:
-              middlePoint.distance > 50
-                ? HANDPOSES.DEFAULT
-                : HANDPOSES.INDEX_TO_THUMB,
-          },
-        })
-      );
+      this.eventBus.publish("update-position", {
+        position: middlePoint.center,
+        handpose:
+          middlePoint.distance > 50
+            ? HANDPOSES.DEFAULT
+            : HANDPOSES.INDEX_TO_THUMB,
+      });
 
       this.drawPoint(middlePoint.center.x, middlePoint.center.y, 10, "black");
     }
@@ -100,14 +90,8 @@ class HandposeDetection {
     requestAnimationFrame(this.doPredictions);
   };
 
-  public onPositionUpdate(callback: (point: PointType) => void) {
-    document.addEventListener(
-      this.updateEventKey,
-      ({ detail }: CustomEvent<PointType>) => {
-        callback(detail);
-      }
-    );
-  }
+  public onPositionUpdate = (callback: (point: PointType) => void) =>
+    this.eventBus.subscribe("update-position", callback);
 }
 
 export default HandposeDetection;

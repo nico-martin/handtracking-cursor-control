@@ -36,6 +36,10 @@ const init = async (app) => {
       cursorInstance.setCursorState(CURSOR_STATE.OPEN);
     }
   });
+
+  cursorInstance.addEventListener("click", (e) =>
+    console.log("cursorInstance click", e)
+  );
 };
 
 init(document.querySelector<HTMLDivElement>("#app"));
