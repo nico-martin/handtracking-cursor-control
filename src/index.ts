@@ -31,14 +31,14 @@ const init = async (app) => {
     cursorInstance.setCursorPosition(x, y);
 
     if (point.handpose === HANDPOSES.INDEX_TO_THUMB) {
-      cursorInstance.setCursorState(CURSOR_STATE.LEFTCLICK);
+      cursorInstance.setCursorState(CURSOR_STATE.PINCH);
     } else {
       cursorInstance.setCursorState(CURSOR_STATE.OPEN);
     }
   });
 
-  cursorInstance.addEventListener("click", (e) =>
-    console.log("cursorInstance click", e)
+  cursorInstance.addEventListener("mousemove", (e) =>
+    window.scrollTo(0, window.scrollY + e.movementY * -1)
   );
 };
 
