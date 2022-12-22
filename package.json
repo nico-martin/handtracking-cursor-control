@@ -6,15 +6,15 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "npm run dev",
-    "dev": "npm run serve:dev && npm run build:dev",
+    "dev": "npm run build:dev",
     "prod": "npm run build:prod",
     "build:dev": "webpack --config webpack.config.js -d source-map --watch",
-    "serve:dev": "webpack serve --config webpack.config.js",
     "build:prod": "webpack"
   },
   "author": "Nico Martin <nico@sayhello.ch>",
   "license": "MIT",
   "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "dotenv": "^16.0.3",
     "fs": "^0.0.1-security",

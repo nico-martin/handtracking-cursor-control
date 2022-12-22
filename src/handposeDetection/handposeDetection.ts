@@ -6,7 +6,7 @@ import {
 } from "@tensorflow-models/hand-pose-detection";
 
 import { setWasmPaths, version_wasm } from "@tensorflow/tfjs-backend-wasm";
-import EventBus from "./EventBus";
+import EventBus from "../helpers/EventBus";
 
 setWasmPaths(
   `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${version_wasm}/dist/`
