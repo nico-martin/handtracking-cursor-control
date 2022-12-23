@@ -1,6 +1,9 @@
+import { log } from "./log";
+
 class Video {
   private readonly video: HTMLVideoElement = null;
   private readonly canvas: HTMLCanvasElement = null;
+  private renderFrame: boolean = false;
   private activeCameraID = null;
   private artboardSize: { width: number; height: number } = {
     height: 0,
@@ -74,6 +77,7 @@ class Video {
   };
 
   public startUp = async (cameraId = "") => {
+    this.renderFrame = true;
     await this.initCamera(
       cameraId,
       this.artboardSize[0],
@@ -82,13 +86,18 @@ class Video {
     );
     await this.video.play();
     this.video.addEventListener("loadeddata", () => {
-      console.log("Camera is ready");
+      log("Camera is ready");
     });
     this.renderCanvas();
   };
 
+  public shutDown = async () => {
+    this.renderFrame = false;
+    this.stream && this.stream.getTracks().forEach((track) => track.stop());
+  };
+
   private renderCanvas = () => {
-    if (!this.canvas) return;
+    if (!this.canvas || !this.renderFrame) return;
     const context = this.canvas.getContext("2d");
     // re-register callback
     requestAnimationFrame(this.renderCanvas);

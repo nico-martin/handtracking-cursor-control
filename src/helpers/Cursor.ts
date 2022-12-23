@@ -1,5 +1,5 @@
 import EventBus from "./EventBus";
-import { CURSOR_STATE, CursorPosition, EventsDefinitions } from "./Cursor.d";
+import { CURSOR_STATE, CursorPosition, EventsDefinitions } from "./Cursor.type";
 
 class Cursor {
   private readonly cursor: HTMLDivElement = null;

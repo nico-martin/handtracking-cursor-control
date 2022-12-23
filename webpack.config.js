@@ -19,8 +19,8 @@ module.exports = (env) => {
       options: `${dirSrc}/options.ts`,
     },
     performance: {
-      maxAssetSize: 5000000,
-      maxEntrypointSize: 5000000,
+      maxAssetSize: 50000000,
+      maxEntrypointSize: 50000000,
       hints: "error",
     },
     output: {

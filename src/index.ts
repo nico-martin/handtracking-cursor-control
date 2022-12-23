@@ -1,7 +1,7 @@
 import styles from "./index.css";
 import Video from "./helpers/Video";
 import Cursor from "./helpers/Cursor";
-import { CURSOR_STATE } from "./helpers/Cursor.d";
+import { CURSOR_STATE } from "./helpers/Cursor.type";
 import HandposeDetection, {
   HANDPOSES,
 } from "./handposeDetection/handposeDetection";

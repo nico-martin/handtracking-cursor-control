@@ -31,9 +31,12 @@ class HandposeDetection {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
 
+    console.log(chrome.runtime.getURL("mediapipe"));
+    console.log(chrome.runtime.getURL("mediapipe/hands.js"));
+
     createDetector(SupportedModels.MediaPipeHands, {
       runtime: "mediapipe", // or 'tfjs',
-      solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/hands",
+      solutionPath: chrome.runtime.getURL("mediapipe"),
       modelType: "full",
     }).then(async (detector) => {
       this.detector = detector;
