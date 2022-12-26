@@ -22,4 +22,5 @@
   position: relative;
   border: 3px solid transparent;
   transform: translateY(-50%) translateX(-50%);
+  z-index: 9999;
 }

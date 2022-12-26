@@ -4,9 +4,11 @@ import {
   Hand,
   SupportedModels,
 } from "@tensorflow-models/hand-pose-detection";
+import * as tf from "@tensorflow/tfjs";
 
 import { setWasmPaths, version_wasm } from "@tensorflow/tfjs-backend-wasm";
 import EventBus from "../helpers/EventBus";
+import { error } from "../helpers/log";
 
 setWasmPaths(
   `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${version_wasm}/dist/`
@@ -14,9 +16,7 @@ setWasmPaths(
 
 export enum HANDPOSES {
   DEFAULT = "default",
-  FIST = "fist",
   INDEX_TO_THUMB = "indexToThumb",
-  MIDDLE_TO_THUMB = "middleToThumb",
 }
 
 type PointType = { position: { x: number; y: number }; handpose: HANDPOSES };
@@ -31,16 +31,16 @@ class HandposeDetection {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
 
-    console.log(chrome.runtime.getURL("mediapipe"));
-    console.log(chrome.runtime.getURL("mediapipe/hands.js"));
-
-    createDetector(SupportedModels.MediaPipeHands, {
-      runtime: "mediapipe", // or 'tfjs',
-      solutionPath: chrome.runtime.getURL("mediapipe"),
-      modelType: "full",
-    }).then(async (detector) => {
-      this.detector = detector;
-      await this.doPredictions();
+    tf.setBackend("wasm").then(() => {
+      createDetector(SupportedModels.MediaPipeHands, {
+        runtime: "tfjs",
+        modelType: "full",
+      })
+        .then(async (detector) => {
+          this.detector = detector;
+          await this.doPredictions();
+        })
+        .catch((e) => error(e));
     });
   }
 

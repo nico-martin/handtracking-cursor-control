@@ -10,9 +10,9 @@ export const sendMessage = <T = any>(
   payload: T,
   callback: (response: string) => void
 ) => {
-  getActiveTab().then((tab) =>
-    chrome.tabs.sendMessage(tab.id, { type, payload }, callback)
-  );
+  getActiveTab().then((tab) => {
+    chrome.tabs.sendMessage(tab.id, { type, payload }, callback);
+  });
 };
 
 export const onMessageReceive = <T = any>(

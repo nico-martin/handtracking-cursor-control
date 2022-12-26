@@ -1,7 +1,7 @@
 import styles from "./popup.css";
 import { sendMessage } from "./helpers/chromeMessage";
 import { MESSAGE_TYPES } from "./helpers/constants";
-
+import { log, error } from "./helpers/log";
 const container = document.querySelector("#hcc-popup-container");
 
 if (container) {
@@ -11,7 +11,7 @@ if (container) {
   toggleButton.innerText = "Start3";
   toggleButton.classList.add(styles.toggleButton);
   toggleButton.onclick = async () => {
-    console.log("toggleButton.onclick");
+    log("toggleButton.onclick");
     try {
       if (started) {
         toggleButton.innerText = "Start";
@@ -19,11 +19,9 @@ if (container) {
         toggleButton.innerText = "End";
       }
       started = !started;
-      sendMessage<boolean>(MESSAGE_TYPES.SET_STATE, started, (e) =>
-        console.log(e)
-      );
+      sendMessage<boolean>(MESSAGE_TYPES.SET_STATE, started, (e) => log(e));
     } catch (e) {
-      console.error(e);
+      error("error", e);
     }
   };
   container.appendChild(toggleButton);

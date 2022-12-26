@@ -1,1 +1,0 @@
-{"version":3,"file":"assets/popup.css","mappings":";;;AAAA;EACE,YAAY;AACd;;AAEA;EACE,kBAAkB;AACpB","sources":["webpack://handtracking-cursor-control/./src/popup.css"],"sourcesContent":[".container {\n  width: 300px;\n}\n\n.toggleButton {\n  padding: 1rem 2rem;\n}\n"],"names":[],"sourceRoot":""}

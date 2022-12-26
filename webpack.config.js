@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
 
 const app = require("./package.json");
 require("dotenv").config();
@@ -11,6 +12,8 @@ module.exports = (env) => {
   const dirSrc = path.resolve(__dirname, "src");
   const dev = env.WEBPACK_WATCH || false;
 
+  console.log("DEV", dev);
+
   return {
     entry: {
       serviceWorker: `${dirSrc}/serviceWorker.ts`,
@@ -19,9 +22,7 @@ module.exports = (env) => {
       options: `${dirSrc}/options.ts`,
     },
     performance: {
-      maxAssetSize: 50000000,
-      maxEntrypointSize: 50000000,
-      hints: "error",
+      hints: false,
     },
     output: {
       path: dirDist,
@@ -62,6 +63,7 @@ module.exports = (env) => {
       extensions: [".tsx", ".ts", ".js"],
     },
     mode: dev ? "development" : "production",
+    devtool: dev,
     plugins: [
       new MiniCssExtractPlugin({
         filename: "assets/[name].css",
@@ -70,6 +72,7 @@ module.exports = (env) => {
       new CopyPlugin({
         patterns: [{ from: "static" }],
       }),
+      new webpack.SourceMapDevToolPlugin({}),
     ],
   };
 };

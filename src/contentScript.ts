@@ -7,6 +7,7 @@ import { CURSOR_STATE } from "./helpers/Cursor.type";
 import HandposeDetection, {
   HANDPOSES,
 } from "./handposeDetection/handposeDetection";
+import { log } from "./helpers/log";
 
 let app: HTMLDivElement,
   video: HTMLVideoElement,
@@ -18,6 +19,7 @@ let app: HTMLDivElement,
 const init = () => {
   app = document.createElement("div");
   app.classList.add(styles.root);
+  document.body.appendChild(app);
 
   video = document.createElement("video");
   video.classList.add(styles.video);
@@ -63,6 +65,10 @@ const stop = async () => {
 };
 
 init();
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
+  log(message)
+);
 
 onMessageReceive<boolean>(async (type, payload) => {
   if (type === MESSAGE_TYPES.SET_STATE) {

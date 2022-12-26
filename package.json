@@ -14,6 +14,7 @@
   "author": "Nico Martin <nico@sayhello.ch>",
   "license": "MIT",
   "devDependencies": {
+    "@tensorflow/tfjs": "^4.1.0",
     "@types/chrome": "^0.0.206",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
