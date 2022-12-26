@@ -37,7 +37,10 @@ const start = async () => {
   await videoInstance.startUp();
   //console.log(videoInstance.devices);
 
-  cursorInstance = new Cursor(styles.cursor);
+  if (!cursorInstance) {
+    cursorInstance = new Cursor(styles.cursor);
+  }
+  cursorInstance.setup();
   handpose = new HandposeDetection(canvas);
 
   handpose.onPositionUpdate((point) => {
@@ -59,12 +62,12 @@ const start = async () => {
 };
 
 const stop = async () => {
+  app.remove();
+  app = null;
   await videoInstance.shutDown();
-  cursorInstance = null;
+  cursorInstance.cleanup();
   handpose = null;
 };
-
-init();
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
   log(message)

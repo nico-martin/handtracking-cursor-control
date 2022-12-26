@@ -2,20 +2,14 @@ import EventBus from "./EventBus";
 import { CURSOR_STATE, CursorPosition, EventsDefinitions } from "./Cursor.type";
 
 class Cursor {
-  private readonly cursor: HTMLDivElement = null;
+  private cursor: HTMLDivElement = null;
   private cursorState: CURSOR_STATE = CURSOR_STATE.OPEN;
   private eventBus = new EventBus<EventsDefinitions>();
   private movePosition: { x: number; y: number } = null;
+  private readonly className: string = "";
 
   constructor(className: string = "") {
-    this.cursor = document.createElement("div");
-    className && this.cursor.classList.add(className);
-    this.cursor.style.borderColor = "black";
-    this.cursor.style.position = "fixed";
-    this.cursor.style.top = "100px";
-    this.cursor.style.left = "100px";
-    document.body.appendChild(this.cursor);
-
+    this.className = className;
     this.eventBus.subscribe("click", () => {
       const rect = this.cursor.getBoundingClientRect();
 
@@ -27,6 +21,20 @@ class Cursor {
       document.elementFromPoint(rect.left, rect.top).dispatchEvent(evt);
     });
   }
+
+  public setup = () => {
+    this.cursor = document.createElement("div");
+    this.className && this.cursor.classList.add(this.className);
+    this.cursor.style.borderColor = "black";
+    this.cursor.style.position = "fixed";
+    this.cursor.style.top = "100px";
+    this.cursor.style.left = "100px";
+    document.body.appendChild(this.cursor);
+  };
+
+  public cleanup = () => {
+    if (this.cursor) this.cursor.remove();
+  };
 
   private getCursorPosition = (): CursorPosition => {
     const rect = this.cursor.getBoundingClientRect();
