@@ -20,7 +20,8 @@
     }
   ],
   "permissions": [
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "action": {
     "default_title": "Handtracking Cursor Control Extension",

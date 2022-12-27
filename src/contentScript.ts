@@ -43,6 +43,8 @@ const start = async () => {
   cursorInstance.setup();
   handpose = new HandposeDetection(canvas);
 
+  log("handpose init");
+
   handpose.onPositionUpdate((point) => {
     const x = window.innerWidth - point.position.x; // because transform: scaleX(-1) in index.css
     const y = point.position.y;
@@ -56,9 +58,20 @@ const start = async () => {
     }
   });
 
-  cursorInstance.addEventListener("mousemove", (e) =>
-    window.scrollTo(0, window.scrollY + e.movementY * -1)
-  );
+  cursorInstance.addEventListener("click", (e) => {
+    log("Cursor click", e.target);
+    const evt = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    e.target.dispatchEvent(evt);
+  });
+
+  cursorInstance.addEventListener("drag", (e) => {
+    log("Cursor mousemove", e.target);
+    window.scrollTo(0, window.scrollY + e.movementY * -1);
+  });
 };
 
 const stop = async () => {
@@ -69,11 +82,8 @@ const stop = async () => {
   handpose = null;
 };
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
-  log(message)
-);
-
 onMessageReceive<boolean>(async (type, payload) => {
+  log({ type, payload });
   if (type === MESSAGE_TYPES.SET_STATE) {
     if (payload) {
       await start();

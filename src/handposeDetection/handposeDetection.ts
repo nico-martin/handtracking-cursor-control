@@ -5,14 +5,10 @@ import {
   SupportedModels,
 } from "@tensorflow-models/hand-pose-detection";
 import * as tf from "@tensorflow/tfjs";
+import "@tensorflow/tfjs-backend-webgl";
 
-import { setWasmPaths, version_wasm } from "@tensorflow/tfjs-backend-wasm";
 import EventBus from "../helpers/EventBus";
-import { error } from "../helpers/log";
-
-setWasmPaths(
-  `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${version_wasm}/dist/`
-);
+import { error, log } from "../helpers/log";
 
 export enum HANDPOSES {
   DEFAULT = "default",
@@ -31,7 +27,8 @@ class HandposeDetection {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
 
-    tf.setBackend("wasm").then(() => {
+    tf.setBackend("webgl").then(() => {
+      log("tf backend set", tf.getBackend());
       createDetector(SupportedModels.MediaPipeHands, {
         runtime: "tfjs",
         modelType: "full",

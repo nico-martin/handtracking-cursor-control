@@ -14,7 +14,6 @@
   "author": "Nico Martin <nico@sayhello.ch>",
   "license": "MIT",
   "devDependencies": {
-    "@tensorflow/tfjs": "^4.1.0",
     "@types/chrome": "^0.0.206",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
@@ -34,7 +33,9 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "@handtracking.io/yoha": "^1.2.0",
-    "@tensorflow-models/hand-pose-detection": "^2.0.0"
+    "@tensorflow-models/hand-pose-detection": "^2.0.0",
+    "@tensorflow/tfjs": "^4.1.0",
+    "@tensorflow/tfjs-backend-wasm": "^4.1.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.1.0"
   }
 }

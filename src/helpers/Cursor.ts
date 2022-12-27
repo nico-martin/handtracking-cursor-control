@@ -10,16 +10,6 @@ class Cursor {
 
   constructor(className: string = "") {
     this.className = className;
-    this.eventBus.subscribe("click", () => {
-      const rect = this.cursor.getBoundingClientRect();
-
-      const evt = new MouseEvent("click", {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-      });
-      document.elementFromPoint(rect.left, rect.top).dispatchEvent(evt);
-    });
   }
 
   public setup = () => {
@@ -62,9 +52,9 @@ class Cursor {
     if (state === CURSOR_STATE.PINCH) {
       const cursorPosition = this.getCursorPosition();
       this.movePosition &&
-        this.eventBus.publish("mousemove", {
+        this.eventBus.publish("drag", {
           ...cursorPosition,
-          type: "mousemove",
+          type: "drag",
           timestamp: Date.now(),
           movementX: cursorPosition.x - this.movePosition.x,
           movementY: cursorPosition.y - this.movePosition.y,
