@@ -1,24 +1,24 @@
-const path = require("path");
-const fs = require("fs");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const webpack = require("webpack");
+const path = require('path');
+const fs = require('fs');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-const app = require("./package.json");
-require("dotenv").config();
+const app = require('./package.json');
+require('dotenv').config();
 
 module.exports = (env) => {
-  const dirDist = path.resolve(__dirname, "dist");
-  const dirSrc = path.resolve(__dirname, "src");
+  const dirDist = path.resolve(__dirname, 'dist');
+  const dirSrc = path.resolve(__dirname, 'src');
   const dev = env.WEBPACK_WATCH || false;
 
-  console.log("DEV", dev);
+  console.log('DEV', dev);
 
   return {
     entry: {
       serviceWorker: `${dirSrc}/serviceWorker.ts`,
       contentScript: `${dirSrc}/contentScript.ts`,
-      popup: `${dirSrc}/popup.ts`,
+      popup: `${dirSrc}/popup/popup.tsx`,
       options: `${dirSrc}/options.ts`,
     },
     performance: {
@@ -26,14 +26,19 @@ module.exports = (env) => {
     },
     output: {
       path: dirDist,
-      filename: "[name].js",
+      filename: '[name].js',
       clean: true,
     },
     module: {
       rules: [
         {
-          test: /\.ts?$/,
-          use: "ts-loader",
+          test: /\.(ts|tsx)$/,
+          use: 'babel-loader',
+          exclude: /node_modules/,
+        },
+        {
+          test: /\.(ts|tsx)$/,
+          use: 'ts-loader',
           exclude: /node_modules/,
         },
         {
@@ -44,33 +49,33 @@ module.exports = (env) => {
               loader: MiniCssExtractPlugin.loader,
             },
             {
-              loader: "css-loader",
+              loader: 'css-loader',
               options: {
                 importLoaders: 1,
                 modules: {
-                  localIdentName: "[name]__[local]--[hash:base64:5]",
+                  localIdentName: '[name]__[local]--[hash:base64:5]',
                 },
               },
             },
             {
-              loader: "postcss-loader",
+              loader: 'postcss-loader',
             },
           ],
         },
       ],
     },
     resolve: {
-      extensions: [".tsx", ".ts", ".js"],
+      extensions: ['.tsx', '.ts', '.js'],
     },
-    mode: dev ? "development" : "production",
+    mode: dev ? 'development' : 'production',
     devtool: dev,
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "assets/[name].css",
-        chunkFilename: "assets/[name].[id].css",
+        filename: 'assets/[name].css',
+        chunkFilename: 'assets/[name].[id].css',
       }),
       new CopyPlugin({
-        patterns: [{ from: "static" }],
+        patterns: [{ from: 'static' }],
       }),
       new webpack.SourceMapDevToolPlugin({}),
     ],
