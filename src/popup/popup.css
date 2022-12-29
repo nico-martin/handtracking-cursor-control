@@ -1,7 +1,81 @@
+/**
+ * RESET
+ */
+
+html {
+  font-size: 80%;
+}
+
+body {
+  margin: 0;
+  font-size: 100%;
+  font-family: 'Open Sans', sans-serif;
+  color: #555;
+}
+
+p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+button {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  font-size: 1rem;
+  font-family: 'Open Sans', sans-serif;
+  color: #555;
+}
+
+/**
+ * componants
+ */
+
 .container {
-  width: 300px;
+  width: 25rem;
 }
 
 .toggleButton {
   padding: 0.5rem 1rem;
+}
+
+.header {
+  border-bottom: 1px solid #dde2e7;
+  padding: 1.2rem;
+}
+
+.heading {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.main {
+  padding: 1.75rem 1.2rem 1.2rem 1.2rem;
+
+  & > * + * {
+    margin-top: 0.75rem;
+  }
+}
+
+.footerButtonGroup {
+  margin: 1.75rem 0 0 0;
+  width: 100%;
+  display: grid;
+  grid-gap: 1.2rem;
+  grid-auto-flow: column;
+}
+
+.button {
+  padding: 0.8rem 1.2rem 0.8rem 1.2rem;
+  background-color: #ececec;
+  border-radius: 4px;
+  text-align: center;
+  position: relative;
+  transition: 200ms ease-in-out all;
+
+  &:hover {
+    background-color: #e1e1e1;
+  }
 }

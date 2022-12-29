@@ -1,13 +1,18 @@
-import styles from "./contentScript.css";
-import { onMessageReceive } from "./helpers/chromeMessage";
-import { MESSAGE_TYPES } from "./helpers/constants";
-import Video from "./helpers/Video";
-import Cursor from "./helpers/Cursor";
-import { CURSOR_STATE } from "./helpers/Cursor.type";
+import styles from './contentScript.css';
 import HandposeDetection, {
   HANDPOSES,
-} from "./handposeDetection/handposeDetection";
-import { log } from "./helpers/log";
+} from './handposeDetection/handposeDetection';
+import Cursor from './helpers/Cursor';
+import { CURSOR_STATE } from './helpers/Cursor.type';
+import Video from './helpers/Video';
+import { onMessageReceive } from './helpers/chromeMessage';
+import {
+  APPLICATION_STATES,
+  getApplicationState,
+  setApplicationState,
+} from './helpers/chromeStorage';
+import { MESSAGE_TYPES } from './helpers/constants';
+import { log } from './helpers/log';
 
 let app: HTMLDivElement,
   video: HTMLVideoElement,
@@ -17,21 +22,22 @@ let app: HTMLDivElement,
   handpose: HandposeDetection;
 
 const init = () => {
-  app = document.createElement("div");
+  app = document.createElement('div');
   app.classList.add(styles.root);
   document.body.appendChild(app);
 
-  video = document.createElement("video");
+  video = document.createElement('video');
   video.classList.add(styles.video);
   app.appendChild(video);
 
-  canvas = document.createElement("canvas");
+  canvas = document.createElement('canvas');
   canvas.classList.add(styles.canvas);
   app.appendChild(canvas);
 };
 
 const start = async () => {
   if (!app || !video || !canvas) init();
+  await setApplicationState(APPLICATION_STATES.LOADING);
 
   videoInstance = new Video(app, video, canvas);
   await videoInstance.startUp();
@@ -43,9 +49,10 @@ const start = async () => {
   cursorInstance.setup();
   handpose = new HandposeDetection(canvas);
 
-  log("handpose init");
+  log('handpose init');
 
   handpose.onPositionUpdate((point) => {
+    setApplicationState(APPLICATION_STATES.RUNNING);
     const x = window.innerWidth - point.position.x; // because transform: scaleX(-1) in index.css
     const y = point.position.y;
 
@@ -58,9 +65,9 @@ const start = async () => {
     }
   });
 
-  cursorInstance.addEventListener("click", (e) => {
-    log("Cursor click", e.target);
-    const evt = new MouseEvent("click", {
+  cursorInstance.addEventListener('click', (e) => {
+    log('Cursor click', e.target);
+    const evt = new MouseEvent('click', {
       view: window,
       bubbles: true,
       cancelable: true,
@@ -68,17 +75,17 @@ const start = async () => {
     e.target.dispatchEvent(evt);
   });
 
-  cursorInstance.addEventListener("drag", (e) => {
-    log("Cursor mousemove", e.target);
+  cursorInstance.addEventListener('drag', (e) => {
+    log('Cursor mousemove', e.target);
     window.scrollTo(0, window.scrollY + e.movementY * -1);
   });
 };
 
 const stop = async () => {
-  app.remove();
+  if (app) app.remove();
   app = null;
-  await videoInstance.shutDown();
-  cursorInstance.cleanup();
+  if (videoInstance) await videoInstance.shutDown();
+  if (cursorInstance) cursorInstance.cleanup();
   handpose = null;
 };
 

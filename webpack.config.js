@@ -59,6 +59,11 @@ module.exports = (env) => {
             },
             {
               loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: [['postcss-nested']],
+                },
+              },
             },
           ],
         },

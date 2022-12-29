@@ -1,8 +1,14 @@
 import { Fragment, render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
-import { getExtensionActiveOnTab } from '../helpers/chromeStorage';
+import { sendMessage } from '../helpers/chromeMessage';
+import {
+  APPLICATION_STATES,
+  getExtensionActiveOnTab,
+  setExtensionActiveOnTab,
+} from '../helpers/chromeStorage';
 import { getCurrentActiveTabId, goToTab } from '../helpers/chromeTabs';
+import { MESSAGE_TYPES } from '../helpers/constants';
 import { log } from '../helpers/log';
 import styles from './popup.css';
 
@@ -10,6 +16,7 @@ const App = () => {
   const [extensionActiveOnTabId, setExtensionActiveOnTabId] =
     useState<number>(0);
   const [activeTabId, setActiveTabId] = useState<number>(0);
+  const [isStarting, setIsStarting] = useState<boolean>(false);
 
   const asyncSetActiveTabId = async () => {
     setActiveTabId(await getCurrentActiveTabId());
@@ -22,21 +29,35 @@ const App = () => {
   useEffect(() => {
     asyncSetActiveTabId();
     asyncSetExtensionActiveOnTabId();
-    chrome.storage.local.onChanged.addListener((e) =>
-      setExtensionActiveOnTabId(e.extensionActiveOnTab.newValue || 0)
-    );
+    chrome.storage.local.onChanged.addListener((e) => {
+      if (
+        e.extensionActiveOnTab &&
+        e.extensionActiveOnTab.newValue !== e.extensionActiveOnTab.oldValue
+      ) {
+        setExtensionActiveOnTabId(e.extensionActiveOnTab.newValue || 0);
+      }
+      if (
+        e.applicationState &&
+        e.applicationState.newValue !== e.applicationState.oldValue
+      ) {
+        setIsStarting(
+          e.applicationState.newValue === APPLICATION_STATES.LOADING
+        );
+      }
+    });
   }, []);
 
   const onToggleClick = async (newState: boolean) => {
     log('toggleButton.onclick', newState);
     try {
-      await chrome.runtime.sendMessage({
-        type: 'extensionActiveOnTab',
-        payload: newState,
-      });
-      log('toggleButton.onclick message sent');
-
-      //sendMessage<boolean>(MESSAGE_TYPES.SET_STATE, started, (e) => log(e));
+      await setExtensionActiveOnTab(newState);
+      const tabId = await getCurrentActiveTabId();
+      const result = await sendMessage<boolean>(
+        tabId,
+        MESSAGE_TYPES.SET_STATE,
+        newState
+      );
+      log(result);
     } catch (e) {
       alert(e.toString());
     }
@@ -44,28 +65,53 @@ const App = () => {
 
   return (
     <div className={styles.container}>
-      <p>
-        <b>Handtracking Cursor Control</b>
-      </p>
+      <header className={styles.header}>
+        <h1 className={styles.heading}>Handtracking Cursor Control</h1>
+      </header>
       {extensionActiveOnTabId === activeTabId ? (
-        <Fragment>
-          <button onClick={() => onToggleClick(false)}>End</button>
-          <p>Is active here</p>
-        </Fragment>
+        <main className={styles.main}>
+          <p>Cursor Control is currently active.</p>
+          <div className={styles.footerButtonGroup}>
+            <button
+              className={styles.button}
+              onClick={() => onToggleClick(false)}
+            >
+              Stop
+            </button>
+          </div>
+        </main>
       ) : extensionActiveOnTabId !== 0 ? (
-        <Fragment>
-          <button onClick={() => onToggleClick(false)}>End</button>
-          <p>Is active on Tab {extensionActiveOnTabId}</p>
-          <button onClick={() => goToTab(extensionActiveOnTabId)}>
-            {extensionActiveOnTabId}
-          </button>
-        </Fragment>
+        <main className={styles.main}>
+          <p>Cursor Control is currently active in a different tab.</p>
+          <div className={styles.footerButtonGroup}>
+            <button
+              className={styles.button}
+              onClick={() => onToggleClick(false)}
+            >
+              Stop
+            </button>
+            <button
+              className={styles.button}
+              onClick={() => goToTab(extensionActiveOnTabId)}
+            >
+              Switch Tab
+            </button>
+          </div>
+        </main>
       ) : (
-        <Fragment>
-          <button onClick={() => onToggleClick(true)}>Start</button>
-          <br />
-          TabID: {activeTabId}
-        </Fragment>
+        <main className={styles.main}>
+          <p>
+            Cursor Control allows you to operate the website by gesture control.
+          </p>
+          <div className={styles.footerButtonGroup}>
+            <button
+              className={styles.button}
+              onClick={() => onToggleClick(true)}
+            >
+              {isStarting ? 'loading...' : 'Start'}
+            </button>
+          </div>
+        </main>
       )}
     </div>
   );
