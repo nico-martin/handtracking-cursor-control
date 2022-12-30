@@ -1,74 +1,78 @@
-import { Fragment, render } from 'preact';
+import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
-import { sendMessage } from '../helpers/chromeMessage';
 import {
   APPLICATION_STATES,
-  getExtensionActiveOnTab,
-  setExtensionActiveOnTab,
+  ExtensionState,
+  getExtensionState,
+  initialExtensionState,
+  onExtensionStateChange,
+  updateExtensionState,
 } from '../helpers/chromeStorage';
 import { getCurrentActiveTabId, goToTab } from '../helpers/chromeTabs';
-import { MESSAGE_TYPES } from '../helpers/constants';
 import { log } from '../helpers/log';
 import styles from './popup.css';
 
 const App = () => {
-  const [extensionActiveOnTabId, setExtensionActiveOnTabId] =
-    useState<number>(0);
+  const [extensionState, setExtensionState] = useState<ExtensionState>(
+    initialExtensionState
+  );
   const [activeTabId, setActiveTabId] = useState<number>(0);
-  const [isStarting, setIsStarting] = useState<boolean>(false);
 
   const asyncSetActiveTabId = async () => {
     setActiveTabId(await getCurrentActiveTabId());
   };
 
-  const asyncSetExtensionActiveOnTabId = async () => {
-    setExtensionActiveOnTabId(await getExtensionActiveOnTab());
+  const asyncSpdateExtensionState = async () => {
+    setExtensionState(await getExtensionState());
   };
 
   useEffect(() => {
     asyncSetActiveTabId();
-    asyncSetExtensionActiveOnTabId();
-    chrome.storage.local.onChanged.addListener((e) => {
-      if (
-        e.extensionActiveOnTab &&
-        e.extensionActiveOnTab.newValue !== e.extensionActiveOnTab.oldValue
-      ) {
-        setExtensionActiveOnTabId(e.extensionActiveOnTab.newValue || 0);
-      }
-      if (
-        e.applicationState &&
-        e.applicationState.newValue !== e.applicationState.oldValue
-      ) {
-        setIsStarting(
-          e.applicationState.newValue === APPLICATION_STATES.LOADING
-        );
-      }
+    asyncSpdateExtensionState();
+
+    onExtensionStateChange((e) => {
+      setExtensionState((currState) =>
+        Object.keys(currState).reduce(
+          (acc, key) =>
+            key in e
+              ? {
+                  ...acc,
+                  [key]: e[key].newValue,
+                }
+              : acc,
+          currState
+        )
+      );
     });
   }, []);
+
+  useEffect(() => {
+    console.log('popup extensionState', extensionState);
+  }, [extensionState]);
 
   const onToggleClick = async (newState: boolean) => {
     log('toggleButton.onclick', newState);
     try {
-      await setExtensionActiveOnTab(newState);
       const tabId = await getCurrentActiveTabId();
-      const result = await sendMessage<boolean>(
-        tabId,
-        MESSAGE_TYPES.SET_STATE,
-        newState
-      );
-      log(result);
+
+      await updateExtensionState({
+        activeOnTab: newState ? tabId : 0,
+        appState: APPLICATION_STATES.LOADING,
+      });
     } catch (e) {
-      alert(e.toString());
+      alert(e);
     }
   };
+
+  const isLoading = extensionState.appState === APPLICATION_STATES.LOADING;
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.heading}>Handtracking Cursor Control</h1>
       </header>
-      {extensionActiveOnTabId === activeTabId ? (
+      {extensionState.activeOnTab === activeTabId ? (
         <main className={styles.main}>
           <p>Cursor Control is currently active.</p>
           <div className={styles.footerButtonGroup}>
@@ -76,11 +80,11 @@ const App = () => {
               className={styles.button}
               onClick={() => onToggleClick(false)}
             >
-              Stop
+              {isLoading ? 'loading...' : 'Stop'}
             </button>
           </div>
         </main>
-      ) : extensionActiveOnTabId !== 0 ? (
+      ) : extensionState.activeOnTab !== 0 ? (
         <main className={styles.main}>
           <p>Cursor Control is currently active in a different tab.</p>
           <div className={styles.footerButtonGroup}>
@@ -88,11 +92,11 @@ const App = () => {
               className={styles.button}
               onClick={() => onToggleClick(false)}
             >
-              Stop
+              {isLoading ? 'loading...' : 'Stop'}
             </button>
             <button
               className={styles.button}
-              onClick={() => goToTab(extensionActiveOnTabId)}
+              onClick={() => goToTab(extensionState.activeOnTab)}
             >
               Switch Tab
             </button>
@@ -108,11 +112,14 @@ const App = () => {
               className={styles.button}
               onClick={() => onToggleClick(true)}
             >
-              {isStarting ? 'loading...' : 'Start'}
+              {isLoading ? 'loading...' : 'Start'}
             </button>
           </div>
         </main>
       )}
+      <button onClick={() => updateExtensionState(initialExtensionState)}>
+        reset State
+      </button>
     </div>
   );
 };

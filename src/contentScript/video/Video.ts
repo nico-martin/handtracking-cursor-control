@@ -1,5 +1,3 @@
-import { log } from "./log";
-
 class Video {
   private readonly video: HTMLVideoElement = null;
   private readonly canvas: HTMLCanvasElement = null;
@@ -21,7 +19,7 @@ class Video {
     this.canvas = canvas;
     navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
       this.devices = deviceInfos.filter(
-        (device) => device.kind === "videoinput"
+        (device) => device.kind === 'videoinput'
       );
     });
 
@@ -29,7 +27,7 @@ class Video {
       width: artboard.offsetWidth,
       height: artboard.offsetHeight,
     };
-    window.addEventListener("resize", () => {
+    window.addEventListener('resize', () => {
       this.artboardSize = {
         width: artboard.offsetWidth,
         height: artboard.offsetHeight,
@@ -60,7 +58,7 @@ class Video {
     const constraints: MediaStreamConstraints = {
       audio: false,
       video: {
-        facingMode: "user",
+        facingMode: 'user',
         width: width,
         height: height,
         frameRate: { max: fps },
@@ -76,7 +74,7 @@ class Video {
     this.video.srcObject = mediaStream;
   };
 
-  public startUp = async (cameraId = "") => {
+  public init = async (cameraId = '') => {
     this.renderFrame = true;
     await this.initCamera(
       cameraId,
@@ -85,20 +83,17 @@ class Video {
       30
     );
     await this.video.play();
-    this.video.addEventListener("loadeddata", () => {
-      log("Camera is ready");
-    });
     this.renderCanvas();
   };
 
-  public shutDown = async () => {
+  public destroy = async () => {
     this.renderFrame = false;
     this.stream && this.stream.getTracks().forEach((track) => track.stop());
   };
 
   private renderCanvas = () => {
     if (!this.canvas || !this.renderFrame) return;
-    const context = this.canvas.getContext("2d");
+    const context = this.canvas.getContext('2d');
     // re-register callback
     requestAnimationFrame(this.renderCanvas);
     // set internal canvas size to match HTML element size

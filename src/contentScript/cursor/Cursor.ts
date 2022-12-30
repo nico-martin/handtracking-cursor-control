@@ -1,28 +1,28 @@
-import EventBus from "./EventBus";
-import { CURSOR_STATE, CursorPosition, EventsDefinitions } from "./Cursor.type";
+import EventBus from '../eventBus/EventBus';
+import { CURSOR_STATE, CursorPosition, EventsDefinitions } from './Cursor.type';
 
 class Cursor {
   private cursor: HTMLDivElement = null;
   private cursorState: CURSOR_STATE = CURSOR_STATE.OPEN;
   private eventBus = new EventBus<EventsDefinitions>();
   private movePosition: { x: number; y: number } = null;
-  private readonly className: string = "";
+  private readonly className: string = '';
 
-  constructor(className: string = "") {
+  constructor(className: string = '') {
     this.className = className;
   }
 
-  public setup = () => {
-    this.cursor = document.createElement("div");
+  public init = () => {
+    this.cursor = document.createElement('div');
     this.className && this.cursor.classList.add(this.className);
-    this.cursor.style.borderColor = "black";
-    this.cursor.style.position = "fixed";
-    this.cursor.style.top = "100px";
-    this.cursor.style.left = "100px";
+    this.cursor.style.borderColor = 'black';
+    this.cursor.style.position = 'fixed';
+    this.cursor.style.top = '100px';
+    this.cursor.style.left = '100px';
     document.body.appendChild(this.cursor);
   };
 
-  public cleanup = () => {
+  public destroy = () => {
     if (this.cursor) this.cursor.remove();
   };
 
@@ -44,17 +44,17 @@ class Cursor {
   };
 
   public setCursorPosition = (left: number, top: number): void => {
-    this.cursor.style.top = top + "px";
-    this.cursor.style.left = left + "px";
+    this.cursor.style.top = top + 'px';
+    this.cursor.style.left = left + 'px';
   };
 
   public setCursorState = (state: CURSOR_STATE) => {
     if (state === CURSOR_STATE.PINCH) {
       const cursorPosition = this.getCursorPosition();
       this.movePosition &&
-        this.eventBus.publish("drag", {
+        this.eventBus.publish('drag', {
           ...cursorPosition,
-          type: "drag",
+          type: 'drag',
           timestamp: Date.now(),
           movementX: cursorPosition.x - this.movePosition.x,
           movementY: cursorPosition.y - this.movePosition.y,
@@ -72,19 +72,19 @@ class Cursor {
   ) => {
     const cursorPosition = this.getCursorPosition();
     if (oldState === CURSOR_STATE.OPEN && state === CURSOR_STATE.PINCH) {
-      this.eventBus.publish("mousedown", {
+      this.eventBus.publish('mousedown', {
         ...cursorPosition,
-        type: "mousedown",
+        type: 'mousedown',
         timestamp: Date.now(),
       });
     } else if (oldState === CURSOR_STATE.PINCH && state === CURSOR_STATE.OPEN) {
-      this.eventBus.publish("click", {
+      this.eventBus.publish('click', {
         ...cursorPosition,
-        type: "click",
+        type: 'click',
       });
-      this.eventBus.publish("mouseup", {
+      this.eventBus.publish('mouseup', {
         ...cursorPosition,
-        type: "mouseup",
+        type: 'mouseup',
         timestamp: Date.now(),
       });
       this.movePosition = null;

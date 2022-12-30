@@ -17,7 +17,7 @@ module.exports = (env) => {
   return {
     entry: {
       serviceWorker: `${dirSrc}/serviceWorker.ts`,
-      contentScript: `${dirSrc}/contentScript.ts`,
+      contentScript: `${dirSrc}/contentScript/contentScript.ts`,
       popup: `${dirSrc}/popup/popup.tsx`,
       options: `${dirSrc}/options.ts`,
     },
