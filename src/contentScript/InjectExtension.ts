@@ -41,6 +41,8 @@ class InjectExtension {
   };
 
   private initDOM = () => {
+    log('initDOM start');
+
     this.app = document.createElement('div');
     this.app.classList.add(styles.root);
     document.body.appendChild(this.app);
@@ -52,9 +54,13 @@ class InjectExtension {
     this.canvas = document.createElement('canvas');
     this.canvas.classList.add(styles.canvas);
     this.app.appendChild(this.canvas);
+
+    log('initDOM done');
   };
 
   private destroyDOM = () => {
+    log('destroyDOM');
+
     this.app.remove();
   };
 
@@ -77,9 +83,11 @@ class InjectExtension {
      * listeners
      */
 
-    this.handpose.onDetectorSetUp(() =>
-      updateExtensionState({ appState: APPLICATION_STATES.RUNNING })
-    );
+    this.handpose.onDetectorSetUp(() => {
+      console.log('onDetectorSetUp');
+
+      updateExtensionState({ appState: APPLICATION_STATES.RUNNING });
+    });
 
     this.handpose.onPositionUpdate((point) => {
       const x = window.innerWidth - point.position.x; // because transform: scaleX(-1) in index.css

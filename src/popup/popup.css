@@ -75,6 +75,12 @@ button {
   position: relative;
   transition: 200ms ease-in-out all;
 
+  &:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
   &:hover {
     background-color: #e1e1e1;
   }

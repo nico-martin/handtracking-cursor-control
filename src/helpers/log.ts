@@ -2,10 +2,10 @@ const showLog = true;
 
 export const log = (...data: any[]): void => {
   if (!showLog) return;
-  console.log(...data);
+  console.log(...['@@CursorControl', ...data]);
 };
 
 export const error = (...data: any[]): void => {
   if (!showLog) return;
-  console.error(...data);
+  console.error(...['@@CursorControl', ...data]);
 };

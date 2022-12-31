@@ -79,6 +79,7 @@ const App = () => {
             <button
               className={styles.button}
               onClick={() => onToggleClick(false)}
+              disabled={isLoading}
             >
               {isLoading ? 'loading...' : 'Stop'}
             </button>
@@ -91,6 +92,7 @@ const App = () => {
             <button
               className={styles.button}
               onClick={() => onToggleClick(false)}
+              disabled={isLoading}
             >
               {isLoading ? 'loading...' : 'Stop'}
             </button>
@@ -111,12 +113,14 @@ const App = () => {
             <button
               className={styles.button}
               onClick={() => onToggleClick(true)}
+              disabled={isLoading}
             >
               {isLoading ? 'loading...' : 'Start'}
             </button>
           </div>
         </main>
       )}
+      <p>{JSON.stringify(extensionState)}</p>
       <button onClick={() => updateExtensionState(initialExtensionState)}>
         reset State
       </button>

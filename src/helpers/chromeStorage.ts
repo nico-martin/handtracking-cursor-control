@@ -1,4 +1,5 @@
 import { getCurrentActiveTabId } from './chromeTabs';
+import { log } from './log';
 
 export enum APPLICATION_STATES {
   IDLE = 'IDLE',
@@ -46,6 +47,7 @@ export const updateExtensionState = async (
 ): Promise<ExtensionState> => {
   const currState = await getExtensionState();
   const newState = { ...currState, ...state };
+  log('updateExtensionState', newState);
   await chrome.storage.local.set(newState);
   return newState;
 };
