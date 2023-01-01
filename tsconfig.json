@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "noEmit": false,
+    //"noEmitHelpers": false,
     "module": "es6",
     "target": "es5",
     "outDir": "./dist/",
@@ -15,7 +16,7 @@
     ],
     "skipLibCheck": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "jsxImportSource": "preact"
   },
   "exclude": [
     "**/node_modules",

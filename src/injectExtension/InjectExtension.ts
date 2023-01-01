@@ -2,14 +2,15 @@ import {
   APPLICATION_STATES,
   updateExtensionState,
 } from '../helpers/chromeStorage';
-import { log } from '../helpers/log';
-import styles from './contentScript.css';
+import { LOG_TYPES, error, log } from '../helpers/log';
 import Cursor from './cursor/Cursor';
 import { CURSOR_STATE } from './cursor/Cursor.type';
 import HandposeDetection, {
   HANDPOSES,
 } from './handposeDetection/HandposeDetection';
 import Video from './video/Video';
+
+const ID = 'handtracking-cursor-control';
 
 class InjectExtension {
   private app: HTMLDivElement;
@@ -19,12 +20,25 @@ class InjectExtension {
   private cursorInstance: Cursor;
   private handpose: HandposeDetection;
 
-  constructor() {
+  constructor() {}
+
+  public isActive = (): boolean => {
+    const app = document.querySelector<HTMLDivElement>(`#${ID}`);
+    return Boolean(app);
+  };
+
+  public start = async (): Promise<void> => {
+    if (this.isActive()) {
+      await this.destroy();
+    }
     this.initDOM();
-    this.startAnalyzer();
-  }
+    await this.startAnalyzer();
+  };
 
   public destroy = async (): Promise<void> => {
+    if (!this.isActive()) {
+      return;
+    }
     this.destroyDOM();
 
     if (this.videoInstance) {
@@ -41,25 +55,31 @@ class InjectExtension {
   };
 
   private initDOM = () => {
-    log('initDOM start');
+    log(LOG_TYPES.INJECT, 'initDOM start');
 
     this.app = document.createElement('div');
-    this.app.classList.add(styles.root);
+    this.app.id = ID;
+    this.app.style.position = 'fixed';
+    this.app.style.inset = '0';
+    this.app.style['pointer-events '] = 'none';
+    this.app.style.opacity = '0';
     document.body.appendChild(this.app);
 
     this.video = document.createElement('video');
-    this.video.classList.add(styles.video);
+    this.video.style.display = 'none';
     this.app.appendChild(this.video);
 
     this.canvas = document.createElement('canvas');
-    this.canvas.classList.add(styles.canvas);
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = '100%';
+    this.canvas.style.transform = 'scaleX(-1)';
     this.app.appendChild(this.canvas);
 
-    log('initDOM done');
+    log(LOG_TYPES.INJECT, 'initDOM done');
   };
 
   private destroyDOM = () => {
-    log('destroyDOM');
+    log(LOG_TYPES.INJECT, 'destroyDOM');
 
     this.app.remove();
   };
@@ -68,23 +88,23 @@ class InjectExtension {
     this.videoInstance = new Video(this.app, this.video, this.canvas);
     await this.videoInstance.init();
 
-    log('videoInstance init');
+    log(LOG_TYPES.INJECT, 'videoInstance init');
 
-    this.cursorInstance = new Cursor(styles.cursor);
+    this.cursorInstance = new Cursor();
     this.cursorInstance.init();
 
-    log('cursorInstance init');
+    log(LOG_TYPES.INJECT, 'cursorInstance init');
 
     this.handpose = new HandposeDetection(this.canvas);
 
-    log('handpose init');
+    log(LOG_TYPES.INJECT, 'handpose init');
 
     /**
      * listeners
      */
 
     this.handpose.onDetectorSetUp(() => {
-      console.log('onDetectorSetUp');
+      log(LOG_TYPES.INJECT, 'onDetectorSetUp');
 
       updateExtensionState({ appState: APPLICATION_STATES.RUNNING });
     });
@@ -103,7 +123,7 @@ class InjectExtension {
     });
 
     this.cursorInstance.addEventListener('click', (e) => {
-      log('Cursor click', e.target);
+      log(LOG_TYPES.INJECT, 'Cursor click', e.target);
 
       const evt = new MouseEvent('click', {
         view: window,
@@ -114,7 +134,7 @@ class InjectExtension {
     });
 
     this.cursorInstance.addEventListener('drag', (e) => {
-      log('Cursor mousemove', e.target);
+      log(LOG_TYPES.INJECT, 'Cursor mousemove', e.target);
 
       window.scrollTo(0, window.scrollY + e.movementY * -1);
     });

@@ -7,7 +7,7 @@ import {
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 
-import { error, log } from '../../helpers/log';
+import { LOG_TYPES, error, log } from '../../helpers/log';
 import EventBus from '../eventBus/EventBus';
 
 export enum HANDPOSES {
@@ -31,7 +31,7 @@ class HandposeDetection {
     this.ctx = canvas.getContext('2d');
 
     tf.setBackend('webgl').then(() => {
-      log('tf backend set', tf.getBackend());
+      log(LOG_TYPES.HPD, 'tf backend set', tf.getBackend());
       createDetector(SupportedModels.MediaPipeHands, {
         runtime: 'tfjs',
         modelType: 'full',

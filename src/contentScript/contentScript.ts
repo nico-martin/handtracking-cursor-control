@@ -5,39 +5,54 @@ import {
   ExtensionState,
   getExtensionState,
   onExtensionStateChange,
+  updateExtensionState,
 } from '../helpers/chromeStorage';
-import InjectExtension from './InjectExtension';
+import { LOG_TYPES, log } from '../helpers/log';
+import InjectExtension from '../injectExtension/InjectExtension';
 
 const tabIdClient = new TabIdentifierClient();
+const injectExtension = new InjectExtension();
 
-let injectExtension: InjectExtension = null;
+const maybeActivate = async (
+  changedState: ExtensionState,
+  tabId: number
+): Promise<'started' | 'stopped' | 'none'> => {
+  const state = await getExtensionState();
 
-// todo: contentScript is not really reliable, change to executeScript
-//  https://developer.chrome.com/docs/extensions/reference/scripting/#handling-results
-
-const maybeActivate = async (state: ExtensionState, tabId: number) => {
-  if (state?.appState === APPLICATION_STATES.LOADING) {
-    if (state?.activeOnTab === tabId) {
-      injectExtension = new InjectExtension();
-    } else {
-      if (injectExtension) {
-        await injectExtension.destroy();
-        injectExtension = null;
-      }
-    }
+  if (
+    changedState?.appState === APPLICATION_STATES.STARTING &&
+    state.activeOnTab === tabId
+  ) {
+    await injectExtension.start();
+    return 'started';
   }
+
+  if (
+    changedState?.appState === APPLICATION_STATES.STOPPING &&
+    state.activeOnTab === tabId
+  ) {
+    await injectExtension.destroy();
+    await updateExtensionState({ activeOnTab: 0 });
+    return 'stopped';
+  }
+  return 'none';
 };
 
-tabIdClient.getTabId().then((tabId) => {
-  onExtensionStateChange((state) =>
-    maybeActivate(
+const init = async (): Promise<void> => {
+  const tabId = await tabIdClient.getTabId();
+
+  onExtensionStateChange(async (state) => {
+    log(LOG_TYPES.CONTENT_SCRIPT, 'onExtensionStateChange', state);
+
+    const maybe = await maybeActivate(
       {
         appState: state?.appState?.newValue,
         activeOnTab: state?.activeOnTab?.newValue,
       },
       tabId
-    )
-  );
+    );
+    log(LOG_TYPES.CONTENT_SCRIPT, 'onExtensionStateChange maybe', maybe);
+  });
+};
 
-  getExtensionState().then((state) => maybeActivate(state, tabId));
-});
+init().then(() => log(LOG_TYPES.CONTENT_SCRIPT, 'contentScript initialized'));

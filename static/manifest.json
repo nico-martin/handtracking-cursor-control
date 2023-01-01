@@ -13,15 +13,16 @@
       ],
       "js": [
         "contentScript.js"
-      ],
-      "css": [
-        "assets/contentScript.css"
       ]
     }
   ],
   "permissions": [
     "scripting",
-    "storage"
+    "storage",
+    "https://*/*"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "action": {
     "default_title": "Handtracking Cursor Control Extension",

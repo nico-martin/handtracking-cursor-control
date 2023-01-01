@@ -10,7 +10,8 @@ import {
   updateExtensionState,
 } from '../helpers/chromeStorage';
 import { getCurrentActiveTabId, goToTab } from '../helpers/chromeTabs';
-import { log } from '../helpers/log';
+import { IS_DEV } from '../helpers/constants';
+import { LOG_TYPES, log } from '../helpers/log';
 import styles from './popup.css';
 
 const App = () => {
@@ -48,24 +49,29 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log('popup extensionState', extensionState);
+    log(LOG_TYPES.POPUP, 'popup extensionState', extensionState);
   }, [extensionState]);
 
-  const onToggleClick = async (newState: boolean) => {
-    log('toggleButton.onclick', newState);
-    try {
-      const tabId = await getCurrentActiveTabId();
-
-      await updateExtensionState({
-        activeOnTab: newState ? tabId : 0,
-        appState: APPLICATION_STATES.LOADING,
-      });
-    } catch (e) {
-      alert(e);
-    }
+  const start = async (): Promise<void> => {
+    const tabId = await getCurrentActiveTabId();
+    log(LOG_TYPES.POPUP, 'start on Tab', tabId);
+    await updateExtensionState({
+      activeOnTab: tabId,
+      appState: APPLICATION_STATES.STARTING,
+    });
   };
 
-  const isLoading = extensionState.appState === APPLICATION_STATES.LOADING;
+  const stop = async (): Promise<void> => {
+    log(LOG_TYPES.POPUP, 'Stop');
+
+    await updateExtensionState({
+      appState: APPLICATION_STATES.STOPPING,
+    });
+  };
+
+  const isLoading =
+    extensionState.appState === APPLICATION_STATES.STARTING ||
+    extensionState.appState === APPLICATION_STATES.STOPPING;
 
   return (
     <div className={styles.container}>
@@ -78,7 +84,7 @@ const App = () => {
           <div className={styles.footerButtonGroup}>
             <button
               className={styles.button}
-              onClick={() => onToggleClick(false)}
+              onClick={stop}
               disabled={isLoading}
             >
               {isLoading ? 'loading...' : 'Stop'}
@@ -91,7 +97,7 @@ const App = () => {
           <div className={styles.footerButtonGroup}>
             <button
               className={styles.button}
-              onClick={() => onToggleClick(false)}
+              onClick={stop}
               disabled={isLoading}
             >
               {isLoading ? 'loading...' : 'Stop'}
@@ -112,7 +118,7 @@ const App = () => {
           <div className={styles.footerButtonGroup}>
             <button
               className={styles.button}
-              onClick={() => onToggleClick(true)}
+              onClick={start}
               disabled={isLoading}
             >
               {isLoading ? 'loading...' : 'Start'}
@@ -120,10 +126,14 @@ const App = () => {
           </div>
         </main>
       )}
-      <p>{JSON.stringify(extensionState)}</p>
-      <button onClick={() => updateExtensionState(initialExtensionState)}>
-        reset State
-      </button>
+      {IS_DEV && (
+        <div>
+          <p>{JSON.stringify(extensionState)}</p>
+          <button onClick={() => updateExtensionState(initialExtensionState)}>
+            reset State
+          </button>
+        </div>
+      )}
     </div>
   );
 };

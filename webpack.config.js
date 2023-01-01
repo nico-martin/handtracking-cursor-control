@@ -16,7 +16,7 @@ module.exports = (env) => {
 
   return {
     entry: {
-      serviceWorker: `${dirSrc}/serviceWorker.ts`,
+      serviceWorker: `${dirSrc}/serviceWorker/serviceWorker.ts`,
       contentScript: `${dirSrc}/contentScript/contentScript.ts`,
       popup: `${dirSrc}/popup/popup.tsx`,
       options: `${dirSrc}/options.ts`,
@@ -83,6 +83,9 @@ module.exports = (env) => {
         patterns: [{ from: 'static' }],
       }),
       new webpack.SourceMapDevToolPlugin({}),
+      new webpack.DefinePlugin({
+        'env.DEV': JSON.stringify(dev),
+      }),
     ],
   };
 };

@@ -1,27 +1,27 @@
-// todo: on new page if is active on this tab, restart the camera
 import { TabIdentifier } from 'chrome-tab-identifier';
 
 import {
   APPLICATION_STATES,
   getExtensionState,
   updateExtensionState,
-} from './helpers/chromeStorage';
+} from '../helpers/chromeStorage';
+import { LOG_TYPES, log } from '../helpers/log';
 
 const tabIdentifier = new TabIdentifier();
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  console.log(changeInfo, tab);
-  if (changeInfo.status == 'complete') {
+chrome.tabs.onUpdated.addListener(async (tabId, { status }, tab) => {
+  if (status == 'complete') {
+    log(LOG_TYPES.SERVICE_WORKER, 'oonUpdatedn', tabId);
+
     const state = await getExtensionState();
     if (
       tabId === state.activeOnTab &&
       state.appState === APPLICATION_STATES.RUNNING
     ) {
       await updateExtensionState({
-        appState: APPLICATION_STATES.LOADING,
+        appState: APPLICATION_STATES.STARTING,
         activeOnTab: tabId,
       });
-      console.log('activate', tabId);
     }
   }
 });

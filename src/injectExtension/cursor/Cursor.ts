@@ -6,15 +6,18 @@ class Cursor {
   private cursorState: CURSOR_STATE = CURSOR_STATE.OPEN;
   private eventBus = new EventBus<EventsDefinitions>();
   private movePosition: { x: number; y: number } = null;
-  private readonly className: string = '';
 
-  constructor(className: string = '') {
-    this.className = className;
-  }
+  constructor() {}
 
   public init = () => {
     this.cursor = document.createElement('div');
-    this.className && this.cursor.classList.add(this.className);
+    this.cursor.style.width = '20px';
+    this.cursor.style.height = '20px';
+    this.cursor.style['border-radius'] = '500px';
+    this.cursor.style.position = 'relative';
+    this.cursor.style.border = '3px solid transparent';
+    this.cursor.style.transform = 'translateY(-50%) translateX(-50%)';
+    this.cursor.style['z-index'] = '9999';
     this.cursor.style.borderColor = 'black';
     this.cursor.style.position = 'fixed';
     this.cursor.style.top = '100px';
