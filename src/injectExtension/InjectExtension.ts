@@ -51,7 +51,10 @@ class InjectExtension {
       this.cursorInstance = null;
     }
 
-    await updateExtensionState({ appState: APPLICATION_STATES.IDLE });
+    await updateExtensionState({
+      appState: APPLICATION_STATES.IDLE,
+      activeOnTab: 0,
+    });
   };
 
   private initDOM = () => {

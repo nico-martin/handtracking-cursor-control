@@ -32,7 +32,6 @@ const maybeActivate = async (
     state.activeOnTab === tabId
   ) {
     await injectExtension.destroy();
-    await updateExtensionState({ activeOnTab: 0 });
     return 'stopped';
   }
   return 'none';
