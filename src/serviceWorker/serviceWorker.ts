@@ -25,3 +25,17 @@ chrome.tabs.onUpdated.addListener(async (tabId, { status }, tab) => {
     }
   }
 });
+
+chrome.tabs.onRemoved.addListener(async (tabid, removed) => {
+  await updateExtensionState({
+    appState: APPLICATION_STATES.IDLE,
+    activeOnTab: 0,
+  });
+});
+
+chrome.windows.onRemoved.addListener(async (windowid) => {
+  await updateExtensionState({
+    appState: APPLICATION_STATES.IDLE,
+    activeOnTab: 0,
+  });
+});

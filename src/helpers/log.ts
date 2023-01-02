@@ -10,7 +10,7 @@ export enum LOG_TYPES {
 }
 
 const types: Record<LOG_TYPES, boolean> = {
-  INJECT: false,
+  INJECT: true,
   HANDPOSE_DETECTION: false,
   STORAGE: false,
   POPUP: false,

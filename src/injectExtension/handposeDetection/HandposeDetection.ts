@@ -81,9 +81,9 @@ class HandposeDetection {
       );
       const middlePoint = this.findCenterAndDistance(indexTip, thumbTip);
       this.eventBus.publish('update-position', {
-        position: middlePoint.center,
+        position: thumbTip,
         handpose:
-          middlePoint.distance > 50
+          middlePoint.distance > 80
             ? HANDPOSES.DEFAULT
             : HANDPOSES.INDEX_TO_THUMB,
       });

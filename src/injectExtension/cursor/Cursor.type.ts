@@ -1,6 +1,6 @@
 export enum CURSOR_STATE {
-  OPEN = "open",
-  PINCH = "pinch",
+  OPEN = 'open',
+  PINCH = 'pinch',
 }
 
 export interface CursorPosition {
@@ -31,4 +31,5 @@ export type EventsDefinitions = {
   mouseup: CursorPointerEvent;
   mousedown: CursorPointerEvent;
   drag: CursorMoveEvent;
+  move: CursorMoveEvent;
 };

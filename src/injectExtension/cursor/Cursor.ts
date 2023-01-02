@@ -1,27 +1,31 @@
 import EventBus from '../eventBus/EventBus';
 import { CURSOR_STATE, CursorPosition, EventsDefinitions } from './Cursor.type';
 
+const initialCursorStyles: Partial<CSSStyleDeclaration> = {
+  width: '15px',
+  height: '15px',
+  borderRadius: '500px',
+  border: '2px solid transparent',
+  transform: 'translateY(-50%) translateX(-50%)',
+  transition: '100ms ease-in-out scale',
+  zIndex: '9999',
+  borderColor: 'black',
+  position: 'fixed',
+  top: '0px',
+  left: '0px',
+};
+
 class Cursor {
   private cursor: HTMLDivElement = null;
   private cursorState: CURSOR_STATE = CURSOR_STATE.OPEN;
   private eventBus = new EventBus<EventsDefinitions>();
-  private movePosition: { x: number; y: number } = null;
+  private movePosition: { x: number; y: number } = { x: 0, y: 0 };
 
   constructor() {}
 
   public init = () => {
     this.cursor = document.createElement('div');
-    this.cursor.style.width = '20px';
-    this.cursor.style.height = '20px';
-    this.cursor.style['border-radius'] = '500px';
-    this.cursor.style.position = 'relative';
-    this.cursor.style.border = '3px solid transparent';
-    this.cursor.style.transform = 'translateY(-50%) translateX(-50%)';
-    this.cursor.style['z-index'] = '9999';
-    this.cursor.style.borderColor = 'black';
-    this.cursor.style.position = 'fixed';
-    this.cursor.style.top = '100px';
-    this.cursor.style.left = '100px';
+    this.setCursorStyle(initialCursorStyles);
     document.body.appendChild(this.cursor);
   };
 
@@ -41,6 +45,11 @@ class Cursor {
       target: document.elementFromPoint(rect.left, rect.top),
     };
   };
+
+  public setCursorStyle = (styles: Partial<CSSStyleDeclaration>) =>
+    Object.entries(styles).map(
+      ([property, value]) => (this.cursor.style[property] = value)
+    );
 
   public setCursorColor = (color: string): void => {
     this.cursor.style.borderColor = color;
@@ -63,6 +72,15 @@ class Cursor {
           movementY: cursorPosition.y - this.movePosition.y,
         });
       this.movePosition = { x: cursorPosition.x, y: cursorPosition.y };
+    } else if (state === CURSOR_STATE.OPEN) {
+      const cursorPosition = this.getCursorPosition();
+      this.eventBus.publish('move', {
+        ...cursorPosition,
+        type: 'move',
+        timestamp: Date.now(),
+        movementX: cursorPosition.x - this.movePosition.x,
+        movementY: cursorPosition.y - this.movePosition.y,
+      });
     }
     if (state === this.cursorState) return;
     this.onCursorStateChange(state, this.cursorState);
@@ -90,7 +108,7 @@ class Cursor {
         type: 'mouseup',
         timestamp: Date.now(),
       });
-      this.movePosition = null;
+      this.movePosition = { x: 0, y: 0 };
     }
   };
 

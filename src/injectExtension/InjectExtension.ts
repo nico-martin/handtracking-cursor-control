@@ -2,7 +2,8 @@ import {
   APPLICATION_STATES,
   updateExtensionState,
 } from '../helpers/chromeStorage';
-import { LOG_TYPES, error, log } from '../helpers/log';
+import { isFocusable } from '../helpers/functions';
+import { LOG_TYPES, log } from '../helpers/log';
 import Cursor from './cursor/Cursor';
 import { CURSOR_STATE } from './cursor/Cursor.type';
 import HandposeDetection, {
@@ -64,7 +65,7 @@ class InjectExtension {
     this.app.id = ID;
     this.app.style.position = 'fixed';
     this.app.style.inset = '0';
-    this.app.style['pointer-events '] = 'none';
+    this.app.style.pointerEvents = 'none';
     this.app.style.opacity = '0';
     document.body.appendChild(this.app);
 
@@ -106,10 +107,9 @@ class InjectExtension {
      * listeners
      */
 
-    this.handpose.onDetectorSetUp(() => {
+    this.handpose.onDetectorSetUp(async () => {
+      await updateExtensionState({ appState: APPLICATION_STATES.RUNNING });
       log(LOG_TYPES.INJECT, 'onDetectorSetUp');
-
-      updateExtensionState({ appState: APPLICATION_STATES.RUNNING });
     });
 
     this.handpose.onPositionUpdate((point) => {
@@ -137,9 +137,28 @@ class InjectExtension {
     });
 
     this.cursorInstance.addEventListener('drag', (e) => {
-      log(LOG_TYPES.INJECT, 'Cursor mousemove', e.target);
+      log(LOG_TYPES.INJECT, 'drag', e.target);
 
       window.scrollTo(0, window.scrollY + e.movementY * -1);
+    });
+
+    this.cursorInstance.addEventListener('mousedown', (e) =>
+      this.cursorInstance.setCursorStyle({ scale: '0.7' })
+    );
+
+    this.cursorInstance.addEventListener('mouseup', (e) =>
+      this.cursorInstance.setCursorStyle({ scale: '1' })
+    );
+
+    this.cursorInstance.addEventListener('move', (e) => {
+      if (isFocusable(e.target)) {
+        this.cursorInstance.setCursorStyle({ scale: '1.5' });
+      } else {
+        this.cursorInstance.setCursorStyle({ scale: '1' });
+      }
+
+      //log(LOG_TYPES.INJECT, 'Cursor mousemove', e.target);
+      //log(LOG_TYPES.INJECT, 'focusable', isFocusable(e.target));
     });
   };
 }
