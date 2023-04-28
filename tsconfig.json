@@ -1,26 +1,25 @@
 {
   "compilerOptions": {
-    "noEmit": false,
-    //"noEmitHelpers": false,
-    "module": "es6",
-    "target": "es5",
-    "outDir": "./dist/",
-    "rootDir": "./src/",
-    "moduleResolution": "node",
-    //"strict": true,
-    "strictNullChecks": false,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
+    "strict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": [
-      "es2015",
-      "dom"
-    ],
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
     "skipLibCheck": true,
+    "strictNullChecks": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "preact",
+    "noImplicitAny": false,
   },
-  "exclude": [
-    "**/node_modules",
-    "**/dist",
-    "src/handposeDetection/src"
+  "include": [
+    "src"
   ]
 }

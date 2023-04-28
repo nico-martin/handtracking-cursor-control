@@ -53,10 +53,10 @@ button {
 
 .main {
   padding: 1.75rem 1.2rem 1.2rem 1.2rem;
+}
 
-  & > * + * {
-    margin-top: 0.75rem;
-  }
+.main > * + * {
+  margin-top: 0.75rem;
 }
 
 .footerButtonGroup {
@@ -74,14 +74,14 @@ button {
   text-align: center;
   position: relative;
   transition: 200ms ease-in-out all;
+}
 
-  &:disabled {
-    cursor: not-allowed;
-    pointer-events: none;
-    opacity: 0.9;
-  }
+.button:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.9;
+}
 
-  &:hover {
-    background-color: #e1e1e1;
-  }
+.button:hover {
+  background-color: #e1e1e1;
 }

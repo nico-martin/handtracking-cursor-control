@@ -94,10 +94,10 @@ class HandposeDetection {
     requestAnimationFrame(this.doPredictions);
   };
 
-  public onPositionUpdate = (callback: (point: PointType) => void) =>
+  public onPositionUpdate = (callback: (point: true | PointType) => void) =>
     this.eventBus.subscribe('update-position', callback);
 
-  public onDetectorSetUp = (callback: (state: true) => void) =>
+  public onDetectorSetUp = (callback: (state: true | PointType) => void) =>
     this.eventBus.subscribe('detector-setup', callback);
 }
 

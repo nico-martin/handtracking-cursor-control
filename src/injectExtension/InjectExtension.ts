@@ -113,6 +113,9 @@ class InjectExtension {
     });
 
     this.handpose.onPositionUpdate((point) => {
+      if (point === true) {
+        return;
+      }
       const x = window.innerWidth - point.position.x; // because transform: scaleX(-1) in index.css
       const y = point.position.y;
 
