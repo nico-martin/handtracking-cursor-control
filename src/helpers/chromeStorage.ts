@@ -30,6 +30,7 @@ export const initialExtensionState: ExtensionState = {
 
 export const getExtensionState = async (): Promise<ExtensionState> => {
   const store = await chrome.storage.local.get();
+  log(LOG_TYPES.STORAGE, { getExtensionState: store });
   return Object.keys(initialExtensionState).reduce(
     (acc, key) =>
       store[key]

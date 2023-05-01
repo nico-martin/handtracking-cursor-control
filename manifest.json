@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "manifest_version": 3,
   "background": {
-    "service_worker": "serviceWorker.js"
+    "service_worker": "serviceWorker/serviceWorker.ts",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -12,14 +13,14 @@
         "<all_urls>"
       ],
       "js": [
-        "contentScript.js"
-      ]
+        "contentScript/contentScript.ts"
+      ],
+      "type": "module"
     }
   ],
   "permissions": [
     "scripting",
-    "storage",
-    "https://*/*"
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"

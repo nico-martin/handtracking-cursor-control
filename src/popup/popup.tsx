@@ -12,7 +12,7 @@ import {
 import { getCurrentActiveTabId, goToTab } from '../helpers/chromeTabs';
 import { IS_DEV } from '../helpers/constants';
 import { LOG_TYPES, log } from '../helpers/log';
-import styles from './popup.css';
+import styles from './popup.module.css';
 
 const App = () => {
   const [extensionState, setExtensionState] = useState<ExtensionState>(

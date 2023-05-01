@@ -11,7 +11,7 @@ const tabIdentifier = new TabIdentifier();
 
 chrome.tabs.onUpdated.addListener(async (tabId, { status }, tab) => {
   if (status == 'complete') {
-    log(LOG_TYPES.SERVICE_WORKER, 'oonUpdatedn', tabId);
+    log(LOG_TYPES.SERVICE_WORKER, 'onUpdated', tabId);
 
     const state = await getExtensionState();
     if (

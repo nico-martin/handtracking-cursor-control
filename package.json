@@ -1,16 +1,18 @@
 {
   "name": "handtracking-cursor-control",
   "title": "Handtracking Cursor Control",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Control your cursor with you hand",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --watch",
     "build": "tsc && vite build"
   },
   "author": "Nico Martin <nico@sayhello.ch>",
   "license": "MIT",
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.14",
     "@preact/preset-vite": "^2.5.0",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/chrome": "^0.0.206",

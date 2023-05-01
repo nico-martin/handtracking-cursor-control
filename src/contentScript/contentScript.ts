@@ -5,13 +5,15 @@ import {
   ExtensionState,
   getExtensionState,
   onExtensionStateChange,
-  updateExtensionState,
 } from '../helpers/chromeStorage';
 import { LOG_TYPES, log } from '../helpers/log';
 import InjectExtension from '../injectExtension/InjectExtension';
 
 const tabIdClient = new TabIdentifierClient();
 const injectExtension = new InjectExtension();
+
+console.log('TEST');
+log(LOG_TYPES.CONTENT_SCRIPT, 'TEST2');
 
 const maybeActivate = async (
   changedState: ExtensionState,
