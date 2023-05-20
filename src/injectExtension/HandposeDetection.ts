@@ -33,7 +33,7 @@ class HandposeDetection {
     console.log('TFJS ready with backend', tfjs.getBackend());
     this.detector = await createDetector(SupportedModels.MediaPipeHands, {
       runtime: 'tfjs',
-      modelType: 'full',
+      modelType: 'lite',
     });
     return this.detector;
   };
