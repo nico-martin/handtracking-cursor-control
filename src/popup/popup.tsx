@@ -73,6 +73,8 @@ const App = () => {
     extensionState.appState === APPLICATION_STATES.STARTING ||
     extensionState.appState === APPLICATION_STATES.STOPPING;
 
+  const cameras = Object.entries(extensionState.cameras);
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -103,26 +105,27 @@ const App = () => {
                 }
               />
             </label>
-            <label className={styles.selectCamera}>
-              Camera:
-              <select
-                onChange={async (e) => {
-                  await updateExtensionState({
-                    activeCameraId: (e.target as HTMLInputElement).value,
-                  });
-                }}
-              >
-                <option>select..</option>
-                {Object.entries(extensionState.cameras).map(([id, label]) => (
-                  <option
-                    value={id}
-                    selected={extensionState.activeCameraId === id}
-                  >
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {cameras.length > 1 && (
+              <label className={styles.selectCamera}>
+                Camera:
+                <select
+                  onChange={async (e) => {
+                    await updateExtensionState({
+                      activeCameraId: (e.target as HTMLInputElement).value,
+                    });
+                  }}
+                >
+                  {cameras.map(([id, label]) => (
+                    <option
+                      value={id}
+                      selected={extensionState.activeCameraId === id}
+                    >
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
           </Fragment>
         ) : extensionState.activeOnTab !== 0 ? (
           <Fragment>
@@ -163,14 +166,14 @@ const App = () => {
       </main>
       {IS_DEV && (
         <div>
-          <div>
+          {/*<div>
             {Object.entries(extensionState).map(([key, value]) => (
               <p>
                 {key}:<br />
                 {JSON.stringify(value)}
               </p>
             ))}
-          </div>
+          </div>*/}
           <button onClick={() => updateExtensionState(initialExtensionState)}>
             reset State
           </button>

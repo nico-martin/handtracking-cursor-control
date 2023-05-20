@@ -33,6 +33,14 @@ const manifest = defineManifest(async (env) => ({
       '32': 'src/icons/32x.png',
       '48': 'src/icons/48x.png',
       '128': 'src/icons/128x.png',
+      /*loading_16: 'src/icons/loading_16x.png',
+      loading_32: 'src/icons/loading_32x.png',
+      loading_48: 'src/icons/loading_48x.png',
+      loading_128: 'src/icons/loading_128x.png',
+      active_16: 'src/icons/active_16x.png',
+      active_32: 'src/icons/active_32x.png',
+      active_48: 'src/icons/active_48x.png',
+      active_128: 'src/icons/active_128x.png',*/
     },
   },
   icons: {

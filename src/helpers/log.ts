@@ -11,11 +11,11 @@ export enum LOG_TYPES {
 
 const types: Record<LOG_TYPES, boolean> = {
   INJECT: true,
-  HANDPOSE_DETECTION: false,
-  STORAGE: false,
-  POPUP: false,
-  CONTENT_SCRIPT: false,
-  SERVICE_WORKER: false,
+  HANDPOSE_DETECTION: true,
+  STORAGE: true,
+  POPUP: true,
+  CONTENT_SCRIPT: true,
+  SERVICE_WORKER: true,
 };
 
 export const log = (type: LOG_TYPES, ...data: any[]): void => {

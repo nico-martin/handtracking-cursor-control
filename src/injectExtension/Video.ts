@@ -27,30 +27,30 @@ class Video {
 
   public activate = (activeCameraId: string = ''): Promise<void> =>
     new Promise((resolve) => {
-      navigator.mediaDevices
-        .getUserMedia({
-          video: activeCameraId
-            ? {
-                deviceId: activeCameraId,
-              }
-            : true,
-        })
-        .then((stream) => {
-          this.stream = stream;
-          this.element.height = this.stream
-            .getVideoTracks()[0]
-            .getSettings().height;
-          this.element.width = this.stream
-            .getVideoTracks()[0]
-            .getSettings().width;
-          this.element.srcObject = this.stream;
-          this.element.addEventListener('loadeddata', (e) => resolve());
-        });
-
       navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
         this.cameras = deviceInfos.filter(
           (device) => device.kind === 'videoinput'
         );
+
+        navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              deviceId: activeCameraId
+                ? activeCameraId
+                : this.cameras[0].deviceId,
+            },
+          })
+          .then((stream) => {
+            this.stream = stream;
+            this.element.height = this.stream
+              .getVideoTracks()[0]
+              .getSettings().height;
+            this.element.width = this.stream
+              .getVideoTracks()[0]
+              .getSettings().width;
+            this.element.srcObject = this.stream;
+            this.element.addEventListener('loadeddata', (e) => resolve());
+          });
       });
     });
 

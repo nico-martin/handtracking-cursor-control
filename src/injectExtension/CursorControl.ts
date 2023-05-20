@@ -165,7 +165,7 @@ class CursorControl {
 
       const sizeRelative = ((100 / this.frame.height) * point.size) / 100;
       const pose =
-        sizeRelative > 0.02 ? HANDPOSES.DEFAULT : HANDPOSES.INDEX_TO_THUMB;
+        sizeRelative > 0.04 ? HANDPOSES.DEFAULT : HANDPOSES.INDEX_TO_THUMB;
 
       if (pose === HANDPOSES.INDEX_TO_THUMB) {
         this.cursor.setCursorState(CURSOR_STATE.PINCH);

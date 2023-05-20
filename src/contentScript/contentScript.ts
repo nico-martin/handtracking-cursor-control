@@ -19,12 +19,14 @@ const maybeActivate = async (
   tabId: number
 ): Promise<'started' | 'stopped' | 'none'> => {
   const state = await getExtensionState();
+  log(LOG_TYPES.CONTENT_SCRIPT, 'maybeActivate', state, tabId);
 
   if (
     changedState?.appState === APPLICATION_STATES.STARTING &&
     state.activeOnTab === tabId
   ) {
     await initExtension(state.showCamera, state.activeCameraId);
+    log(LOG_TYPES.CONTENT_SCRIPT, 'maybeActivate started');
     return 'started';
   }
 
@@ -33,8 +35,10 @@ const maybeActivate = async (
     state.activeOnTab === tabId
   ) {
     await stopExtension();
+    log(LOG_TYPES.CONTENT_SCRIPT, 'maybeActivate stopped');
     return 'stopped';
   }
+  log(LOG_TYPES.CONTENT_SCRIPT, 'maybeActivate none');
   return 'none';
 };
 
@@ -55,6 +59,8 @@ const init = async (): Promise<void> => {
     );
     log(LOG_TYPES.CONTENT_SCRIPT, 'onExtensionStateChange maybe', maybe);
   });
+
+  await maybeActivate(await getExtensionState(), tabId);
 };
 
 init().then(() => log(LOG_TYPES.CONTENT_SCRIPT, 'contentScript initialized'));
