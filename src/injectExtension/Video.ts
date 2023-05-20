@@ -3,6 +3,7 @@ class Video {
   public element: HTMLVideoElement;
   public stream: MediaStream;
   public wrapper: HTMLDivElement;
+  public cameras: Array<MediaDeviceInfo>;
 
   private constructor() {}
 
@@ -12,7 +13,6 @@ class Video {
     this.element.height = 0;
     this.element.autoplay = true;
     this.element.muted = true;
-    console.log('append element');
     this.wrapper.append(this.element);
   };
 
@@ -25,14 +25,15 @@ class Video {
     return Video.instance;
   }
 
-  public activate = (): Promise<void> =>
+  public activate = (activeCameraId: string = ''): Promise<void> =>
     new Promise((resolve) => {
       navigator.mediaDevices
         .getUserMedia({
-          video: {
-            deviceId:
-              'a293c12547fe1c69d0b89646e3c44f11e4de21b636c9cdc75c14c1346edfbfa4',
-          },
+          video: activeCameraId
+            ? {
+                deviceId: activeCameraId,
+              }
+            : true,
         })
         .then((stream) => {
           this.stream = stream;
@@ -43,15 +44,12 @@ class Video {
             .getVideoTracks()[0]
             .getSettings().width;
           this.element.srcObject = this.stream;
-          this.element.addEventListener('loadeddata', (e) => {
-            console.log('loadeddata', e);
-            resolve();
-          });
+          this.element.addEventListener('loadeddata', (e) => resolve());
         });
 
       navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
-        console.log(
-          deviceInfos.filter((device) => device.kind === 'videoinput')
+        this.cameras = deviceInfos.filter(
+          (device) => device.kind === 'videoinput'
         );
       });
     });

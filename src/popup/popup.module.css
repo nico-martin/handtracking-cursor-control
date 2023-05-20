@@ -67,6 +67,26 @@ button {
   grid-auto-flow: column;
 }
 
+.showCamera {
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.selectCamera {
+  margin-top: 1rem;
+  width: 100%;
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.selectCamera select {
+  padding: 0.25em;
+  flex-grow: 1;
+}
+
 .button {
   padding: 0.8rem 1.2rem 0.8rem 1.2rem;
   background-color: #ececec;

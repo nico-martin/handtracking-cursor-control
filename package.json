@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --m development",
     "build": "tsc && vite build"
   },
   "author": "Nico Martin <nico@sayhello.ch>",

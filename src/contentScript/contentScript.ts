@@ -15,7 +15,7 @@ import {
 const tabIdClient = new TabIdentifierClient();
 
 const maybeActivate = async (
-  changedState: ExtensionState,
+  changedState: Partial<ExtensionState>,
   tabId: number
 ): Promise<'started' | 'stopped' | 'none'> => {
   const state = await getExtensionState();
@@ -24,7 +24,7 @@ const maybeActivate = async (
     changedState?.appState === APPLICATION_STATES.STARTING &&
     state.activeOnTab === tabId
   ) {
-    await initExtension();
+    await initExtension(state.showCamera, state.activeCameraId);
     return 'started';
   }
 
@@ -48,6 +48,8 @@ const init = async (): Promise<void> => {
       {
         appState: state?.appState?.newValue,
         activeOnTab: state?.activeOnTab?.newValue,
+        showCamera: state?.showCamera?.newValue,
+        activeCameraId: state?.activeCameraId?.newValue,
       },
       tabId
     );

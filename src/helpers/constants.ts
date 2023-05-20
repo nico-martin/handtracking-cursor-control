@@ -1,3 +1,3 @@
 // @ts-ignore
-//export const IS_DEV: boolean = Boolean(import.meta.env.DEV);
-export const IS_DEV: boolean = true;
+export const IS_DEV: boolean = import.meta.env.MODE === 'development';
+//export const IS_DEV: boolean = true;

@@ -10,6 +10,9 @@ export enum APPLICATION_STATES {
 export interface ExtensionState {
   appState: APPLICATION_STATES;
   activeOnTab: number;
+  showCamera: boolean;
+  activeCameraId: string;
+  cameras: Record<string, string>;
 }
 
 interface ListenerCallbackParams {
@@ -21,11 +24,20 @@ interface ListenerCallbackParams {
     newValue: number;
     oldValue: number;
   };
+  showCamera: { newValue: boolean; oldValue: boolean };
+  activeCameraId: { newValue: string; oldValue: string };
+  cameras: {
+    newValue: Record<string, string>;
+    oldValue: Record<string, string>;
+  };
 }
 
 export const initialExtensionState: ExtensionState = {
   appState: APPLICATION_STATES.IDLE,
   activeOnTab: 0,
+  showCamera: false,
+  activeCameraId: null,
+  cameras: {},
 };
 
 export const getExtensionState = async (): Promise<ExtensionState> => {

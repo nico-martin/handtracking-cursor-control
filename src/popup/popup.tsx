@@ -1,4 +1,4 @@
-import { render } from 'preact';
+import { Fragment, render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
 import {
@@ -78,57 +78,99 @@ const App = () => {
       <header className={styles.header}>
         <h1 className={styles.heading}>Handtracking Cursor Control</h1>
       </header>
-      {extensionState.activeOnTab === activeTabId ? (
-        <main className={styles.main}>
-          <p>Cursor Control is currently active.</p>
-          <div className={styles.footerButtonGroup}>
-            <button
-              className={styles.button}
-              onClick={stop}
-              disabled={isLoading}
-            >
-              {isLoading ? 'loading...' : 'Stop'}
-            </button>
-          </div>
-        </main>
-      ) : extensionState.activeOnTab !== 0 ? (
-        <main className={styles.main}>
-          <p>Cursor Control is currently active in a different tab.</p>
-          <div className={styles.footerButtonGroup}>
-            <button
-              className={styles.button}
-              onClick={stop}
-              disabled={isLoading}
-            >
-              {isLoading ? 'loading...' : 'Stop'}
-            </button>
-            <button
-              className={styles.button}
-              onClick={() => goToTab(extensionState.activeOnTab)}
-            >
-              Switch Tab
-            </button>
-          </div>
-        </main>
-      ) : (
-        <main className={styles.main}>
-          <p>
-            Cursor Control allows you to operate the website by gesture control.
-          </p>
-          <div className={styles.footerButtonGroup}>
-            <button
-              className={styles.button}
-              onClick={start}
-              disabled={isLoading}
-            >
-              {isLoading ? 'loading...' : 'Start'}
-            </button>
-          </div>
-        </main>
-      )}
+      <main className={styles.main}>
+        {extensionState.activeOnTab === activeTabId ? (
+          <Fragment>
+            <p>Cursor Control is currently active.</p>
+            <div className={styles.footerButtonGroup}>
+              <button
+                className={styles.button}
+                onClick={stop}
+                disabled={isLoading}
+              >
+                {isLoading ? 'loading...' : 'Stop'}
+              </button>
+            </div>
+            <label className={styles.showCamera}>
+              Show camera
+              <input
+                type="checkbox"
+                checked={extensionState.showCamera}
+                onChange={async (e) =>
+                  await updateExtensionState({
+                    showCamera: (e.target as HTMLInputElement).checked,
+                  })
+                }
+              />
+            </label>
+            <label className={styles.selectCamera}>
+              Camera:
+              <select
+                onChange={async (e) => {
+                  await updateExtensionState({
+                    activeCameraId: (e.target as HTMLInputElement).value,
+                  });
+                }}
+              >
+                <option>select..</option>
+                {Object.entries(extensionState.cameras).map(([id, label]) => (
+                  <option
+                    value={id}
+                    selected={extensionState.activeCameraId === id}
+                  >
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </Fragment>
+        ) : extensionState.activeOnTab !== 0 ? (
+          <Fragment>
+            <p>Cursor Control is currently active in a different tab.</p>
+            <div className={styles.footerButtonGroup}>
+              <button
+                className={styles.button}
+                onClick={stop}
+                disabled={isLoading}
+              >
+                {isLoading ? 'loading...' : 'Stop'}
+              </button>
+              <button
+                className={styles.button}
+                onClick={() => goToTab(extensionState.activeOnTab)}
+              >
+                Switch Tab
+              </button>
+            </div>
+          </Fragment>
+        ) : (
+          <Fragment>
+            <p>
+              Cursor Control allows you to operate the website by gesture
+              control.
+            </p>
+            <div className={styles.footerButtonGroup}>
+              <button
+                className={styles.button}
+                onClick={start}
+                disabled={isLoading}
+              >
+                {isLoading ? 'loading...' : 'Start'}
+              </button>
+            </div>
+          </Fragment>
+        )}
+      </main>
       {IS_DEV && (
         <div>
-          <p>{JSON.stringify(extensionState)}</p>
+          <div>
+            {Object.entries(extensionState).map(([key, value]) => (
+              <p>
+                {key}:<br />
+                {JSON.stringify(value)}
+              </p>
+            ))}
+          </div>
           <button onClick={() => updateExtensionState(initialExtensionState)}>
             reset State
           </button>

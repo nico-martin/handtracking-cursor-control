@@ -30,6 +30,7 @@ class Canvas {
     ctx.beginPath();
     ctx.rect(frame.left, frame.top, frame.width, frame.height);
     ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     if (position) {

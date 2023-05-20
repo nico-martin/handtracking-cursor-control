@@ -5,12 +5,10 @@ import Video from './Video';
 import { BrowserFrame, CursorPoint, HANDPOSES, isFocusable } from './utlis';
 
 const FLIP_VIDEO_HORIZONTAL = true;
-const SHOW_VIDEO = true;
 
 class CursorControl {
   private static instance: CursorControl;
   private id = 'cursorControl';
-  private initialized: boolean = false;
   private wrapper: HTMLDivElement;
   private video: Video;
   private canvas: Canvas;
@@ -18,6 +16,7 @@ class CursorControl {
   private frame: BrowserFrame;
   private handposeDetection: HandposeDetection;
   private doAnimationFrame: boolean = false;
+  private showVideo: boolean = false;
 
   private constructor() {
     this.cursor = new Cursor();
@@ -31,8 +30,9 @@ class CursorControl {
     return CursorControl.instance;
   }
 
-  public destroy = () => {
+  public destroy = async () => {
     this.doAnimationFrame = false;
+    await new Promise((resolve) => window.setTimeout(resolve, 1000));
     this.video.destroy();
     this.handposeDetection.destroy();
     this.wrapper.remove();
@@ -40,8 +40,8 @@ class CursorControl {
     window.removeEventListener('resize', this.setFrame);
   };
 
-  public initialize = async (): Promise<void> => {
-    if (this.initialized) this.destroy();
+  public initialize = async (activeCameraId: string = ''): Promise<void> => {
+    if (Boolean(document.querySelector(`#${this.id}`))) await this.destroy();
 
     this.wrapper = document.createElement('div');
     this.wrapper.id = this.id;
@@ -58,7 +58,7 @@ class CursorControl {
     this.video.init();
     if (FLIP_VIDEO_HORIZONTAL)
       this.video.element.style.transform = 'scale(-1, 1)';
-    if (!SHOW_VIDEO) this.video.element.style.opacity = '0';
+    this.video.element.style.opacity = '0';
 
     this.canvas = Canvas.getInstance(this.wrapper);
     this.canvas.init();
@@ -66,7 +66,7 @@ class CursorControl {
     this.canvas.element.style.left = '0px';
     this.canvas.element.style.top = '0px';
 
-    await this.video.activate();
+    await this.video.activate(activeCameraId);
 
     this.canvas.element.width = this.video.element.width;
     this.canvas.element.height = this.video.element.height;
@@ -149,7 +149,7 @@ class CursorControl {
         }
       : null;
 
-    SHOW_VIDEO && this.canvas.draw(point, this.frame);
+    this.showVideo && this.canvas.draw(point, this.frame);
 
     if (point) {
       const leftInFrame = point.x - this.frame.left;
@@ -181,6 +181,25 @@ class CursorControl {
     this.doAnimationFrame = true;
     this.predict();
   };
+
+  public setShowVideo = (show: boolean) => {
+    this.showVideo = show;
+    this.wrapper.style.opacity = show ? '1' : '0';
+    this.video.element.style.opacity = show ? '1' : '0';
+  };
+
+  public setActiveCameraId = async (id: string = '') => {
+    await this.destroy();
+    await this.initialize(id);
+    this.startPrediction();
+    this.setShowVideo(this.showVideo);
+  };
+
+  public getCameraIds = () =>
+    this.video.cameras.reduce(
+      (acc, current) => ({ ...acc, [current.deviceId]: current.label }),
+      {}
+    );
 }
 
 export default CursorControl;
