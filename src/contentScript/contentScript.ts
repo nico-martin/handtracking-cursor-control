@@ -7,13 +7,12 @@ import {
   onExtensionStateChange,
 } from '../helpers/chromeStorage';
 import { LOG_TYPES, log } from '../helpers/log';
-import InjectExtension from '../injectExtension/InjectExtension';
+import {
+  init as initExtension,
+  stop as stopExtension,
+} from '../injectExtension';
 
 const tabIdClient = new TabIdentifierClient();
-const injectExtension = new InjectExtension();
-
-console.log('TEST');
-log(LOG_TYPES.CONTENT_SCRIPT, 'TEST2');
 
 const maybeActivate = async (
   changedState: ExtensionState,
@@ -25,7 +24,7 @@ const maybeActivate = async (
     changedState?.appState === APPLICATION_STATES.STARTING &&
     state.activeOnTab === tabId
   ) {
-    await injectExtension.start();
+    await initExtension();
     return 'started';
   }
 
@@ -33,7 +32,7 @@ const maybeActivate = async (
     changedState?.appState === APPLICATION_STATES.STOPPING &&
     state.activeOnTab === tabId
   ) {
-    await injectExtension.destroy();
+    await stopExtension();
     return 'stopped';
   }
   return 'none';

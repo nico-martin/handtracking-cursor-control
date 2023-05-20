@@ -5,11 +5,11 @@ class EventBus<EventsDefinitions = Record<string, any>> {
 
   constructor() {
     INSTANCE++;
-    this.eventBus = new Comment("nm-pubsub-event-bus-" + INSTANCE);
+    this.eventBus = new Comment('nm-pubsub-event-bus-' + INSTANCE);
   }
 
   private isCustomEvent = (event: Event): event is CustomEvent =>
-    "detail" in event;
+    'detail' in event;
 
   public publish = <T extends keyof EventsDefinitions>(
     eventName: T,

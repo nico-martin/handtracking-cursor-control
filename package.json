@@ -26,6 +26,7 @@
     "@tensorflow/tfjs": "^3.9.0",
     "@tensorflow/tfjs-backend-wasm": "^3.9.0",
     "@tensorflow/tfjs-backend-webgl": "^3.9.0",
+    "@tensorflow/tfjs-backend-webgpu": "^4.6.0",
     "chrome-tab-identifier": "^0.0.1",
     "preact": "^10.11.3"
   },
