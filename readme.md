@@ -9,8 +9,8 @@ A Chrome Extension that uses [TensorFlow.js](https://www.tensorflow.org/js) [Han
 1. clone this repo
 2. `npm install` to install the dependencies
 3. `npm run build` to build the bundle
-4. open `chrome://extensions`
-5. activate `Developer mode`
-6. click `Load unpacked`
+4. open `chrome://extensions` in Google Chrome
+5. activate `Developer mode` (upper right corner)
+6. click `Load unpacked` (upper left corner)
 7. select `path/to/handtracking-cursor-control/dist/`
 8. Done!
