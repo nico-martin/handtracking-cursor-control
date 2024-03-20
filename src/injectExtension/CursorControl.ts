@@ -72,6 +72,14 @@ class CursorControl {
     this.canvas.element.height = this.video.element.height;
 
     this.cursor.init();
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      this.cursor.setCursorColor('white');
+    } else {
+      this.cursor.setCursorColor('black');
+    }
 
     this.setFrame();
     window.addEventListener('resize', this.setFrame);
