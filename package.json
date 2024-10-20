@@ -12,7 +12,7 @@
   "author": "Nico Martin <nico@sayhello.ch>",
   "license": "MIT",
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.14",
+    "@nico-martin/crxjs-vite-plugin": "^2.0.1-beta.3",
     "@preact/preset-vite": "^2.5.0",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/chrome": "^0.0.206",
@@ -22,6 +22,7 @@
     "vite": "^4.3.3"
   },
   "dependencies": {
+    "@mediapipe/hands": "^0.4.1675469240",
     "@tensorflow-models/hand-pose-detection": "^2.0.0",
     "@tensorflow/tfjs": "^3.9.0",
     "@tensorflow/tfjs-backend-wasm": "^3.9.0",

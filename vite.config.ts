@@ -1,4 +1,4 @@
-import { crx, defineManifest } from '@crxjs/vite-plugin';
+import { crx, defineManifest } from '@nico-martin/crxjs-vite-plugin';
 import preact from '@preact/preset-vite';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
